@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Test - HealthSync AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 System Test - HealthSync AI</h1>
+        <p>Testing all system components</p>
+        
+        <div class="test-section" id="frontend-test">
+            <h3>Frontend Server Test</h3>
+            <p>Status: <span id="frontend-status">Testing...</span></p>
+        </div>
+        
+        <div class="test-section" id="api-test">
+            <h3>API Server Test</h3>
+            <p>Status: <span id="api-status">Testing...</span></p>
+        </div>
+        
+        <div class="test-section" id="login-test">
+            <h3>Login System Test</h3>
+            <p>Status: <span id="login-status">Testing...</span></p>
+        </div>
+        
+        <div class="test-section" id="diagnosis-test">
+            <h3>Diagnosis System Test</h3>
+            <p>Status: <span id="diagnosis-status">Testing...</span></p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="btn">← Back to Home</a>
+            <a href="/login.html" class="btn">Go to Login</a>
+            <a href="/clinical-diagnosis.html" class="btn">Go to Diagnosis</a>
+        </div>
+    </div>
+
+    <script>
+        // Test frontend server
+        async function testFrontend() {
+            try {
+                const response = await fetch('/');
+                if (response.ok) {
+                    document.getElementById('frontend-status').textContent = '✅ Working';
+                    document.getElementById('frontend-test').className = 'test-section success';
+                } else {
+                    throw new Error('Frontend server not responding');
+                }
+            } catch (error) {
+                document.getElementById('frontend-status').textContent = '❌ Error: ' + error.message;
+                document.getElementById('frontend-test').className = 'test-section error';
+            }
+        }
+        
+        // Test API server
+        async function testAPI() {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('api-status').textContent = '✅ Working - ' + data.status;
+                    document.getElementById('api-test').className = 'test-section success';
+                } else {
+                    throw new Error('API server not responding');
+                }
+            } catch (error) {
+                document.getElementById('api-status').textContent = '❌ Error: ' + error.message;
+                document.getElementById('api-test').className = 'test-section error';
+            }
+        }
+        
+        // Test login system
+        async function testLogin() {
+            try {
+                const response = await fetch('/login.html');
+                if (response.ok) {
+                    document.getElementById('login-status').textContent = '✅ Working';
+                    document.getElementById('login-test').className = 'test-section success';
+                } else {
+                    throw new Error('Login page not accessible');
+                }
+            } catch (error) {
+                document.getElementById('login-status').textContent = '❌ Error: ' + error.message;
+                document.getElementById('login-test').className = 'test-section error';
+            }
+        }
+        
+        // Test diagnosis system
+        async function testDiagnosis() {
+            try {
+                const response = await fetch('/clinical-diagnosis.html');
+                if (response.ok) {
+                    document.getElementById('diagnosis-status').textContent = '✅ Working';
+                    document.getElementById('diagnosis-test').className = 'test-section success';
+                } else {
+                    throw new Error('Diagnosis page not accessible');
+                }
+            } catch (error) {
+                document.getElementById('diagnosis-status').textContent = '❌ Error: ' + error.message;
+                document.getElementById('diagnosis-test').className = 'test-section error';
+            }
+        }
+        
+        // Run all tests
+        window.addEventListener('load', function() {
+            testFrontend();
+            testAPI();
+            testLogin();
+            testDiagnosis();
+        });
+    </script>
+</body>
+</html>

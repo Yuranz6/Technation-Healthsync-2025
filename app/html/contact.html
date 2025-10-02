@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Empathy Canada</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <script type='module' src='/js/main.js'></script>
+</head>
+<body class = "contact-page">
+
+    <!-- Navigation Bar -->
+    <div id="navbar-container"></div>
+    <script>
+        fetch("/components/navbar.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading navbar:", error));
+    </script>
+
+    <!-- ✅ Wrap Page Content in .main-content to Keep Footer at Bottom -->
+    <div class="main-content">
+        <section class="mission-content">
+            <h1 class="gray-heading">OUR EMPATHY CANADA’S</h1>
+            <h1 class="black-heading">Contact Information</h1>
+            <p>If you have any questions or inquiries, feel free to reach out to us at 1-800-EMPATHY or Empathy.Canada@mail.org. We more than welcome any inquiries on our mission, implementation and development process!</p>
+        </section>
+    </div> 
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script>
+        fetch("/components/footer.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading footer:", error));
+    </script>
+
+</body>
+</html>

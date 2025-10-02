@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+    <title>Register - HealthSync AI</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <style>
+        .register-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .role-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .role-info h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1 style="text-align: center; color: #007bff; margin-bottom: 30px;">📝 Register - HealthSync AI</h1>
+        
+        <div class="role-info">
+            <h4>👨‍⚕️ Account Types</h4>
+            <p><strong>Doctor:</strong> Full access to AI diagnosis and patient management</p>
+            <p><strong>Nurse:</strong> Access to patient care and basic AI features</p>
+            <p><strong>Admin:</strong> System administration and user management</p>
+        </div>
+        
+        <form id="registerForm" class="register-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Enter first name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Enter last name" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="role">Account Type:</label>
+                <select id="role" name="role" required>
+                    <option value="">Select Account Type</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="nurse">Nurse</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="organization">Organization (Optional):</label>
+                <input type="text" id="organization" name="organization" placeholder="Hospital, Clinic, etc.">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Account</button>
+            <a href="/login.html" class="btn btn-secondary" style="text-align: center; text-decoration: none; display: block;">Already have an account? Login</a>
+        </form>
+        
+        <div id="status" class="status"></div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <p><a href="/" style="color: #007bff; text-decoration: none;">← Back to Home</a></p>
+        </div>
+    </div>
+
+    <script>
+        // 用户数据库（模拟）
+        let users = JSON.parse(localStorage.getItem('users') || '{}');
+        
+        // 注册表单处理
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            performRegistration();
+        });
+        
+        // 执行注册
+        function performRegistration() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const organization = document.getElementById('organization').value;
+            const statusDiv = document.getElementById('status');
+            
+            // 验证密码
+            if (password !== confirmPassword) {
+                statusDiv.className = 'status error';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '❌ Passwords do not match';
+                return;
+            }
+            
+            // 检查邮箱是否已存在
+            if (users[email]) {
+                statusDiv.className = 'status error';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '❌ Email already exists';
+                return;
+            }
+            
+            // 显示加载状态
+            statusDiv.className = 'status info';
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '🔄 Creating account...';
+            
+            // 模拟注册过程
+            setTimeout(() => {
+                // 创建新用户
+                const newUser = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    role: role,
+                    password: password,
+                    organization: organization,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // 保存到本地存储
+                users[email] = newUser;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Account created successfully! Redirecting to login...';
+                
+                // 3秒后跳转到登录页面
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 3000);
+                
+            }, 1500);
+        }
+        
+        // 密码确认验证
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (password !== confirmPassword && confirmPassword.length > 0) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#28a745';
+            }
+        });
+        
+        // 邮箱验证
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            if (users[email]) {
+                this.style.borderColor = '#dc3545';
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = 'status error';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '❌ Email already exists';
+            } else {
+                this.style.borderColor = '#28a745';
+                document.getElementById('status').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

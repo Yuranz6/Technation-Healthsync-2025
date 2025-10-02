@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+    <title>Role Manager - HealthSync AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; margin: 10px; }
+        .btn:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .status { padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .user-info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Role Manager</h1>
+        <p>Manage user roles and permissions</p>
+        
+        <div id="current-user" class="user-info">
+            <h3>Current User</h3>
+            <div id="user-details">Loading...</div>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div>
+            <h3>Quick Actions</h3>
+            <button class="btn" onclick="makeCurrentUserAdmin()">Make Current User Admin</button>
+            <button class="btn" onclick="resetToDoctor()">Reset to Doctor</button>
+            <button class="btn" onclick="resetToNurse()">Reset to Nurse</button>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h3>Available Roles</h3>
+            <ul>
+                <li><strong>admin</strong> - Full system access, can manage users</li>
+                <li><strong>doctor</strong> - Can access clinical notes and AI diagnosis</li>
+                <li><strong>nurse</strong> - Can access basic features and patient care</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/test-clinical-notes.html" class="btn">← Back to Clinical Notes</a>
+            <a href="/user-management.html" class="btn">Go to User Management</a>
+        </div>
+    </div>
+
+    <script>
+        // 显示当前用户信息
+        function showCurrentUser() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.getElementById('user-details').innerHTML = `
+                    <p><strong>Email:</strong> ${userData.username}</p>
+                    <p><strong>Name:</strong> ${userData.name || `${userData.firstName} ${userData.lastName}`}</p>
+                    <p><strong>Current Role:</strong> ${userData.role}</p>
+                    <p><strong>Organization:</strong> ${userData.organization || 'N/A'}</p>
+                `;
+            } else {
+                document.getElementById('user-details').innerHTML = '<p>No user logged in</p>';
+            }
+        }
+        
+        // 更新用户角色
+        function updateUserRole(newRole) {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                userData.role = newRole;
+                localStorage.setItem('user', JSON.stringify(userData));
+                
+                showStatus(`✅ Role updated to ${newRole}`, 'success');
+                showCurrentUser();
+            } else {
+                showStatus('❌ No user logged in', 'error');
+            }
+        }
+        
+        // 使当前用户成为管理员
+        function makeCurrentUserAdmin() {
+            updateUserRole('admin');
+        }
+        
+        // 重置为医生
+        function resetToDoctor() {
+            updateUserRole('doctor');
+        }
+        
+        // 重置为护士
+        function resetToNurse() {
+            updateUserRole('nurse');
+        }
+        
+        // 登出
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = message;
+        }
+        
+        // 页面加载时显示当前用户
+        window.addEventListener('load', showCurrentUser);
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/x-icon" href="/assets/logo.svg" />
+  <title>Our Mission - Empathy Canada</title>
+  <link href="/css/styles.css" rel="stylesheet" />
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body class="mission-page">
+  <!-- Navigation Bar -->
+  <div id="navbar-container"></div>
+  <script>
+    fetch("/components/navbar.html")
+      .then((response) => response.text())
+      .then((data) => {
+        document.getElementById("navbar-container").innerHTML = data;
+      })
+      .catch((error) => console.error("Error loading navbar:", error));
+  </script>
+
+  <!-- Page Content -->
+  <section class="mission-content">
+    <h1>Our Mission</h1>
+    <p>Connecting Care, Creating Change Through Data</p>
+
+    <!-- Mission Statement -->
+    <div class="mission-details">
+      <h2>Main Focus/Mission Statement</h2>
+
+      <div class="focus-row">
+        <!-- Column for #1 -->
+        <div class="focus-column">
+          <div class="number-container">1</div>
+          <div class="text-container">
+            <p>
+              <strong>Lower</strong> physician <strong>burden</strong>, and
+              <strong>provide</strong> avenues for <strong>preventative medicine.</strong>
+            </p>
+            <p>
+              How? <strong>Streamline</strong> the healthcare practitioner (HP) workflow.
+            </p>
+          </div>
+        </div>
+
+        <!-- Column for #2 -->
+        <div class="focus-column">
+          <div class="number-container">2</div>
+          <div class="text-container">
+            <p>
+              Our HP-facing software will allow patients to
+              <strong>efficiently</strong> have their health-related data shared
+              across <strong>secure HPs across provinces and organizations.</strong>
+            </p>
+            <p>
+              The data collected here can be used to
+              <strong>drive predictive algorithms</strong> and
+              <strong>help healthcare professionals.</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class = "middle-header">
+        <h2 id="our-project-heading">Our Project</h2>
+    </div>
+    
+    <div class="mission-images-container">
+      <!-- First Row - Two images -->
+      <div class="mission-images-row">
+        <img src="/assets/Mission 1.png" alt="Healthcare Building" />
+        <img src="/assets/Mission 2.png" alt="Medical Facility" />
+      </div>
+
+      <!-- Second Row - Three images -->
+      <div class="mission-images-row three-images">
+        <img src="/assets/Mission 3.png" alt="Disease Prevention Data" />
+        <img src="/assets/Mission 4.png" alt="Medical Statistics" />
+        <img src="/assets/Mission 5.png" alt="Healthcare Insights" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <div id="footer-container"></div>
+  <script>
+    fetch("/components/footer.html")
+      .then((response) => response.text())
+      .then((data) => {
+        document.getElementById("footer-container").innerHTML = data;
+      })
+      .catch((error) => console.error("Error loading footer:", error));
+  </script>
+</body>
+</html>

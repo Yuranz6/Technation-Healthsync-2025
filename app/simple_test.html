@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple AI Test</h1>
+    <p>Test the HealthSync AI analysis with a simple form.</p>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" value="35" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="male" selected>Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="blood_pressure">Blood Pressure:</label>
+            <input type="text" id="blood_pressure" name="blood_pressure" value="120/80" placeholder="e.g., 120/80">
+        </div>
+        
+        <div class="form-group">
+            <label for="blood_glucose">Blood Glucose:</label>
+            <input type="number" id="blood_glucose" name="blood_glucose" value="95.5" step="0.1" placeholder="mg/dL">
+        </div>
+        
+        <div class="form-group">
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" name="weight" value="70.5" step="0.1" placeholder="kg">
+        </div>
+        
+        <div class="form-group">
+            <label for="clinical_notes">Clinical Notes:</label>
+            <textarea id="clinical_notes" name="clinical_notes" rows="4" required>Patient reports chest pain and shortness of breath during exercise. No history of heart disease.</textarea>
+        </div>
+        
+        <button type="submit">🔬 Analyze with AI</button>
+    </form>
+    
+    <div id="status" class="result" style="display: none;"></div>
+    <div id="results"></div>
+    
+    <script>
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `result ${type}`;
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = message;
+        }
+        
+        function addResult(message, type) {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const bloodPressure = document.getElementById('blood_pressure').value;
+            const bloodGlucose = parseFloat(document.getElementById('blood_glucose').value) || null;
+            const weight = parseFloat(document.getElementById('weight').value) || null;
+            const clinicalNotes = document.getElementById('clinical_notes').value;
+            
+            if (!clinicalNotes.trim()) {
+                showStatus('Please enter clinical notes', 'error');
+                return;
+            }
+            
+            if (!age || isNaN(age) || age < 0 || age > 120) {
+                showStatus('Please enter a valid age (0-120)', 'error');
+                return;
+            }
+            
+            if (!gender) {
+                showStatus('Please select a gender', 'error');
+                return;
+            }
+            
+            showStatus('🔄 Analyzing with AI...', 'info');
+            
+            const apiData = {
+                patient_data: {
+                    age: age,
+                    gender: gender,
+                    blood_pressure: bloodPressure || null,
+                    blood_glucose: bloodGlucose,
+                    weight: weight,
+                    allergies: null,
+                    medications: null
+                },
+                clinical_notes: clinicalNotes
+            };
+            
+            try {
+                console.log('Sending API request with data:', apiData);
+                
+                const response = await fetch('http://localhost:8000/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(apiData)
+                });
+                
+                console.log('API response status:', response.status);
+                console.log('API response ok:', response.ok);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+                    throw new Error(`API request failed: ${response.status} - ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('API response data:', result);
+                
+                showStatus('✅ Analysis completed successfully!', 'success');
+                
+                // Display results
+                addResult(`<h3>📊 Analysis Results</h3>`, 'info');
+                addResult(`<strong>Primary Diagnosis:</strong> ${result.fused_results && result.fused_results.length > 0 ? result.fused_results[0].disease_name : 'No specific diagnosis'}`, 'info');
+                addResult(`<strong>Confidence:</strong> ${((result.confidence || 0) * 100).toFixed(1)}%`, 'info');
+                
+                if (result.recommendations && result.recommendations.length > 0) {
+                    addResult(`<h4>💡 Recommendations:</h4>`, 'info');
+                    result.recommendations.forEach(rec => {
+                        addResult(`• <strong>${rec.type}:</strong> ${rec.content}`, 'info');
+                    });
+                }
+                
+                addResult(`<h4>📋 Full Response:</h4><pre>${JSON.stringify(result, null, 2)}</pre>`, 'info');
+                
+            } catch (error) {
+                console.error('Analysis failed:', error);
+                console.error('Error stack:', error.stack);
+                showStatus(`❌ Analysis failed: ${error.message}`, 'error');
+                addResult(`<h4>🔍 Error Details:</h4><pre>${error.stack}</pre>`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

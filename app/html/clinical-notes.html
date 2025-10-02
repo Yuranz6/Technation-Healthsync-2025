@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+    <title>Clinical Notes - AI Disease Diagnosis</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <link href="/css/hybrid-model.css" rel="stylesheet">
+    <script type='module' src='/js/main.js'></script>
+    <!-- Auth0 SDK (暂时禁用) -->
+    <!-- <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script> -->
+    <!-- <script src="/js/auth0-config.js"></script> -->
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div id="navbar-container"></div>
+    <script>
+        fetch("/components/navbar.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading navbar:", error));
+    </script>
+
+    <!-- Auth0 User Info (暂时禁用) -->
+    <!-- <div id="user-info" style="display: none; background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <span id="user-name"></span>
+        <button onclick="auth0Functions.logout()" style="float: right; background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Logout</button>
+    </div> -->
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="clinical-notes-container">
+            <h1>Clinical Notes - AI Disease Diagnosis</h1>
+            <p class="subtitle">Enter clinical notes for AI-powered disease diagnosis using ClinicalBERT + XGBoost + RAG</p>
+            
+            <div class="form-container">
+                <form id="clinical-form">
+                    <div class="form-group">
+                        <label for="patient-name">Patient Name:</label>
+                        <input type="text" id="patient-name" name="patient-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="patient-age">Age:</label>
+                        <input type="number" id="patient-age" name="patient-age" min="0" max="120" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="patient-gender">Gender:</label>
+                        <select id="patient-gender" name="patient-gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clinical-notes">Clinical Notes:</label>
+                        <textarea id="clinical-notes" name="clinical-notes" rows="8" 
+                                  placeholder="Enter detailed clinical notes, symptoms, observations, and medical history for AI analysis..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vital-signs">Vital Signs (Optional):</label>
+                        <div class="vital-signs-grid">
+                            <input type="text" id="blood-pressure" name="blood-pressure" placeholder="Blood Pressure (e.g., 120/80)">
+                            <input type="number" id="heart-rate" name="heart-rate" placeholder="Heart Rate (bpm)" step="1">
+                            <input type="number" id="temperature" name="temperature" placeholder="Temperature (°F)" step="0.1">
+                            <input type="number" id="weight" name="weight" placeholder="Weight (kg)" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lab-values">Lab Values (Optional):</label>
+                        <div class="lab-values-grid">
+                            <input type="number" id="blood-glucose" name="blood-glucose" placeholder="Blood Glucose (mg/dL)" step="0.1">
+                            <input type="number" id="cholesterol" name="cholesterol" placeholder="Total Cholesterol (mg/dL)" step="0.1">
+                            <input type="number" id="hdl" name="hdl" placeholder="HDL (mg/dL)" step="0.1">
+                            <input type="number" id="ldl" name="ldl" placeholder="LDL (mg/dL)" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="hybrid-analyze-btn" onclick="performHybridAnalysis()">
+                        🔬 Analyze with AI (ClinicalBERT + XGBoost + RAG)
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Results Section -->
+            <div id="analysis-results" class="results-container" style="display: none;">
+                <h2>AI Analysis Results</h2>
+                <div id="results-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script>
+        fetch("/components/footer.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading footer:", error));
+    </script>
+
+    <!-- Auth0 Initialization (暂时禁用) -->
+    <!-- <script>
+        async function initializeAuth() {
+            try {
+                // 初始化Auth0
+                await auth0Functions.initAuth0();
+                
+                // 处理登录回调
+                const handledCallback = await auth0Functions.handleAuthCallback();
+                
+                // 检查用户是否已登录
+                const isLoggedIn = await auth0Functions.isAuthenticated();
+                
+                if (isLoggedIn) {
+                    // 显示用户信息
+                    const user = await auth0Functions.getUser();
+                    if (user) {
+                        document.getElementById('user-name').textContent = `Welcome, ${user.name || user.email}`;
+                        document.getElementById('user-info').style.display = 'block';
+                    }
+                } else {
+                    // 重定向到登录页面
+                    window.location.href = '/index.html';
+                }
+            } catch (error) {
+                console.error('Auth initialization failed:', error);
+                // 重定向到登录页面
+                window.location.href = '/index.html';
+            }
+        }
+        
+        // 页面加载完成后初始化Auth
+        document.addEventListener('DOMContentLoaded', initializeAuth);
+    </script> -->
+
+    <!-- Hybrid Model Analysis Script -->
+    <script>
+        async function performHybridAnalysis() {
+            console.log('🚀 开始混合模型分析...');
+            
+            try {
+                // 获取表单数据
+                const clinicalNotes = document.getElementById('clinical-notes').value;
+                const patientName = document.getElementById('patient-name').value;
+                const patientAge = parseInt(document.getElementById('patient-age').value);
+                const patientGender = document.getElementById('patient-gender').value;
+                const bloodPressure = document.getElementById('blood-pressure').value;
+                const bloodGlucose = parseFloat(document.getElementById('blood-glucose').value) || null;
+                const cholesterol = parseFloat(document.getElementById('cholesterol').value) || null;
+                const hdl = parseFloat(document.getElementById('hdl').value) || null;
+                const ldl = parseFloat(document.getElementById('ldl').value) || null;
+                
+                if (!clinicalNotes.trim()) {
+                    alert('请输入临床笔记');
+                    return;
+                }
+
+                // 显示加载状态
+                const button = document.querySelector('.hybrid-analyze-btn');
+                const originalText = button.innerHTML;
+                button.innerHTML = '🔄 AI分析中...';
+                button.disabled = true;
+
+                // 准备API数据
+                const apiData = {
+                    age: patientAge,
+                    gender: patientGender,
+                    blood_pressure: bloodPressure || null,
+                    blood_glucose: bloodGlucose,
+                    cholesterol: cholesterol,
+                    hdl: hdl,
+                    ldl: ldl,
+                    clinical_notes: clinicalNotes
+                };
+
+                console.log('发送API数据:', apiData);
+
+                // 调用API
+                const response = await fetch('http://localhost:8000/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(apiData)
+                });
+                
+                console.log('API响应状态:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('API响应数据:', result);
+                
+                // 显示结果
+                displayAnalysisResults(result);
+                
+                // 恢复按钮状态
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+            } catch (error) {
+                console.error('混合模型分析失败:', error);
+                alert('分析失败: ' + error.message);
+                
+                // 恢复按钮状态
+                const button = document.querySelector('.hybrid-analyze-btn');
+                button.innerHTML = '🔬 Analyze with AI (ClinicalBERT + XGBoost + RAG)';
+                button.disabled = false;
+            }
+        }
+
+        function displayAnalysisResults(result) {
+            const resultsContainer = document.getElementById('analysis-results');
+            const resultsContent = document.getElementById('results-content');
+            
+            let html = `
+                <div class="analysis-summary">
+                    <h3>📊 Analysis Summary</h3>
+                    <p><strong>Primary Diagnosis:</strong> ${result.fusion_result.primary_diagnosis}</p>
+                    <p><strong>Risk Assessment:</strong> ${result.fusion_result.risk_assessment}</p>
+                    <p><strong>Confidence Score:</strong> ${(result.confidence_score * 100).toFixed(1)}%</p>
+                    <p><strong>Urgency Level:</strong> ${result.fusion_result.urgency}</p>
+                </div>
+                
+                <div class="clinical-bert-results">
+                    <h3>🧠 ClinicalBERT Analysis</h3>
+                    <p><strong>Diseases Detected:</strong> ${result.clinical_bert_analysis.diseases_detected.join(', ') || 'None'}</p>
+                    <p><strong>Symptoms Identified:</strong> ${result.clinical_bert_analysis.symptoms_identified.join(', ') || 'None'}</p>
+                    <p><strong>Analysis:</strong> ${result.clinical_bert_analysis.analysis}</p>
+                </div>
+                
+                <div class="xgboost-results">
+                    <h3>📈 XGBoost Risk Analysis</h3>
+                    <p><strong>Risk Score:</strong> ${(result.xgboost_analysis.risk_score * 100).toFixed(1)}%</p>
+                    <p><strong>Risk Level:</strong> ${result.xgboost_analysis.risk_level}</p>
+                    <p><strong>Risk Factors:</strong> ${result.xgboost_analysis.risk_factors.join(', ') || 'None'}</p>
+                </div>
+                
+                <div class="recommendations">
+                    <h3>💡 Recommendations</h3>
+                    <ul>
+                        ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            resultsContent.innerHTML = html;
+            resultsContainer.style.display = 'block';
+            
+            // 滚动到结果
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>

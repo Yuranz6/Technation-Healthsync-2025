@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Empathy Canada</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <script type='module' src='/js/main.js'></script>
+</head>
+
+
+
+<body class="privacy-page">
+
+    <!-- Navigation Bar -->
+    <div id="navbar-container"></div>
+    <script>
+        fetch("/components/navbar.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading navbar:", error));
+    </script>
+
+    <!-- ✅ Wrap Page Content in .main-content to Keep Footer at Bottom -->
+    <div class="main-content">
+        <section class="mission-content">
+            <h1 class="gray-heading">OUR EMPATHY CANADA’S</h1>
+            <h1 class="black-heading">Privacy Mission</h1>
+            <p>Patients can only access their own personal health information through secure login credentials.
+                Physicians are granted access strictly on a need-to-know basis, in accordance with the
+                <em>Personal Information Protection and Electronic Documents Act (PIPEDA)</em>.
+                All access to patient data is role-based and closely monitored to ensure compliance with Canadian privacy regulations
+                and to protect the confidentiality of patient information.</p>
+        </section>
+    </div> 
+
+    
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script>
+        fetch("/components/footer.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading footer:", error));
+    </script>
+
+</body>
+</html>

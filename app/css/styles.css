@@ -1,0 +1,869 @@
+/*@import "/node_modules/@fortawesome/fontawesome-free/css/all.css";*/
+
+
+/* General Styles */
+body {
+    font-family: "Nunito", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+/* === Navigation Bar === */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e0efff;
+    padding: 15px 50px;
+}
+
+.black-heading {
+    font-size: 7rem;
+    margin: 0;
+    padding: 0;
+}
+.sub-heading {
+    font-size: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.btn {
+        display: inline-block;
+        padding: 1rem 4rem;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+        background: #004a92;
+        color: white;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.primary-btn {
+    background: #005eb8;
+    color: white;
+}
+.secondary-btn {
+    background: white;
+    color: #005eb8;
+}
+
+.nav-left .logo img {
+    height: 4rem;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Ensures links are aligned to the right */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 10px; /* Adjust spacing */
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links .profile-icon {
+    margin-left: auto; /* Pushes profile icon away from the other links */
+}
+
+
+.nav-links li {
+    display: flex !important; 
+    align-items: center;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+}
+
+/* === Profile Icon === */
+
+
+.profile-icon img {
+    height: 30px;
+    cursor: pointer;
+}
+
+/* === Hero Section Fix (Doctor Image Alignment) === */
+.hero {
+    display: flex;
+    align-items: center; /* Ensures text and image are vertically centered */
+    justify-content: space-between; /* Pushes text to the left and image to the right */
+    padding: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px; /* Adds space between text and image */
+}
+
+.hero-text {
+    flex: 1;
+    max-width: 50%; /* Prevents text from taking full width */
+}
+
+.hero-image {
+    flex: 1;
+    text-align: right; /* Ensures the image stays on the right */
+}
+
+.hero-image img {
+    width: 120%;  /* Increases the size beyond the container */
+    max-width: 1400px;  /* Ensures it doesn’t get too large */
+    height: auto;  /* Maintains aspect ratio */
+}
+
+
+/* === Responsive Fix for Smaller Screens === */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-image {
+        text-align: center;
+    }
+
+    .hero-image img {
+        max-width: 80%;
+    }
+}
+
+/* === Contact Page === */
+.contact-container {
+    text-align: center;
+    padding: 40px;
+}
+
+.contact-details {
+    margin-top: 20px;
+}
+
+.contact-details p {
+    font-size: 18px;
+}
+
+/* === Footer Section === */
+/* Ensures the entire page takes full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Pushes the footer to the bottom when content is short */
+.patient-form-container {
+    flex: 1;
+}
+
+/* Footer stays at the bottom of the page */
+.footer {
+    background-color: #2C2C2C;
+    color: white;
+    padding: 20px 0;
+    width: 100%;
+    text-align: center;
+    position: relative; /* ✅ Fixed: changed from absolute */
+    bottom: 0;
+    margin-top: auto; /* ✅ Push footer to bottom when content is short */
+}
+
+
+
+
+#footer-container {
+    width: 100%;
+    margin-top: auto; /* ✅ Ensures it moves to the bottom */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+#footer-container {
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.footer-section {
+    flex: 1;
+    text-align: center;
+    margin: 10px;
+}
+
+.footer-section img {
+    height: 50px;
+}
+
+.footer-section h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+.footer-section ul li a:hover {
+    color: #007bff;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-links img {
+    height: 20px;
+}
+
+/* ========================================= */
+/* === Mission Page Styles (Scoped) === */
+/* ========================================= */
+
+/* Background for mission page */
+body.mission-page {
+    background-color: white;
+}
+
+/* Mission page headings & paragraphs */
+.mission-page .mission-content h1 {
+    font-size: 48px;
+    font-weight: 900;
+    color: #333;
+    text-align: center;
+    margin-top: 40px;
+}
+.mission-page .mission-content p {
+    font-size: 22px;
+    line-height: 1.6;
+    color: #555;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 20px auto;
+}
+
+.mission-page .mission-details {
+    margin-top: 40px;
+    text-align: center;
+}
+.mission-page #our-project-heading {
+    font-size: 36px;       /* or 48px to match the top heading */
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin: 40px 0;        /* top and bottom margin */
+}
+
+/* Mission Statement Layout (Numbers 1 & 2) */
+.mission-page .focus-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 80%;
+    margin: 0 auto 60px auto; /* bottom spacing */
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.mission-page .focus-column {
+    position: relative;
+    flex: 1 1 45%;
+    min-width: 280px;
+}
+
+/* Large, faint numbers in the background */
+.mission-page .number-container {
+    font-size: 10rem;
+    font-weight: 900;
+    color: rgba(0, 0, 0, 0.05);
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* non-interactive */
+    user-select: none;
+}
+
+/* Text container that sits in front of the number */
+.mission-page .text-container {
+    position: relative;
+    margin-left: 40px;  /* offset from the number */
+    margin-top: 60px;   /* push text below the number */
+    text-align: left;
+}
+.mission-page .text-container p {
+    font-size: 20px;
+    line-height: 1.5;
+    margin: 0 0 15px 0;
+    color: #333;
+}
+.mission-page .text-container p strong {
+    font-weight: 700;
+}
+
+.mission-page .mission-content h2 {
+    font-size: 48px;
+    font-weight: 900;
+    color: #333;
+    text-align: center;
+    margin-top: 40px;
+}
+
+
+/* Mission Images Section (remains unchanged) */
+.mission-page .mission-images-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.mission-page .mission-images-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+}
+.mission-page .mission-images-row img {
+    width: 50%;
+}
+.mission-page .mission-images-row.three-images img {
+    width: calc(33.33% - 10px);
+}
+
+/* Responsive Adjustments for Mission Page */
+@media (max-width: 768px) {
+  .mission-page .focus-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+  }
+  .mission-page .focus-column {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .mission-page .number-container {
+    font-size: 6rem; /* scaled down for mobile */
+  }
+  .mission-page .text-container {
+    margin-left: 0;
+    margin-top: 20px;
+    text-align: center;
+  }
+}
+
+/* ===================== */
+/* Mission Images Section */
+/* ===================== */
+
+.mission-images-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.mission-images-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.mission-images-row img {
+    width: 50%;
+}
+
+.mission-images-row.three-images img {
+    width: calc(33.33% - 10px);
+}
+
+/* ========================================= */
+/* === Privacy Page Styles (Scoped) === */
+/* ========================================= */
+
+/* Background for privacy page */
+body.privacy-page {
+    background-color: white;
+}
+
+/* Mission page headings & paragraphs */
+.privacy-page .mission-content h1 {
+    font-size: 48px;
+    font-weight: 900;
+    color: #333;
+    text-align: center;
+    margin-top: 40px;
+}
+.privacy-page .mission-content p {
+    width: 33%;            /* Confines the paragraph to one third of the screen width */
+    margin: 0 auto 20px;    /* Centers it horizontally with some bottom margin */
+    font-size: 25px;        /* Retains your desired font size */
+    line-height: 1.6;
+    color: #555;
+    text-align: center;
+}
+
+/* ========================================= */
+/* === Contact Page Styles (Scoped) === */
+/* ========================================= */
+
+/* Background for privacy page */
+body.contact-page {
+    background-color: white;
+}
+
+/* Mission page headings & paragraphs */
+.contact-page .mission-content h1 {
+    font-size: 48px;
+    font-weight: 900;
+    color: #333;
+    text-align: center;
+    margin-top: 40px;
+}
+.contact-page .mission-content p {
+    width: 33%;            /* Confines the paragraph to one third of the screen width */
+    margin: 0 auto 20px;    /* Centers it horizontally with some bottom margin */
+    font-size: 25px;        /* Retains your desired font size */
+    line-height: 1.6;
+    color: #555;
+    text-align: center;
+}
+/* === Patient Form Styles === */
+.patient-form-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.patient-form-container h1 {
+    text-align: center;
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+legend {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin: 10px 0 5px;
+    color: #555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Form Styling */
+@media (max-width: 768px) {
+    .patient-form-container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea {
+        font-size: 14px;
+    }
+}
+
+/* Make the page take up the full viewport height */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Pushes the footer to the bottom when content is short */
+.main-content {
+    flex: 1;
+}
+
+/* ✅ Patient Table Styling */
+.dashboard-container {
+    width: 90%;
+    border-collapse: collapse;
+    padding: 10px auto;
+    margin: 20px auto;
+    background: white;
+}
+
+.patient-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+.patient-table th, .patient-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.patient-table th {
+    background: #f5f5f5;
+    font-weight: bold;
+}
+
+.patient-table tr:hover {
+    background: #f1f1f1;
+}
+
+/* ✅ Active Status Styling */
+.status.active {
+    background: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* ✅ View Button */
+.view-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.view-btn:hover {
+    background: #0056b3;
+}
+
+/* ✅ Patient Info Section */
+.patient-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 1rem;
+    height: 100vh;
+    width: 80%;
+    margin: 1rem auto;
+}
+
+.patient-info-grid-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+.patient-summary-item { 
+    grid-area: 1 / 1 / 3 / 2;  /* 2 rows, 1 column */
+    background: #f0f8ff; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s;
+}
+.card {
+    padding: 25px;
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+}
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+.phone-number {
+    font-size: 16px;
+    color: #005eb8;
+    text-decoration: none;
+    margin-bottom: 15px;
+    display: inline-block;
+    transition: color 0.3s;
+}
+
+.patient-info-grid-item h2 {
+    font-size: 22px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.patient-info-details {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.patient-info-details p {
+    font-size: 16px;
+    color: #555;
+    margin: 8px 0;
+}
+
+.patient-info-details strong {
+    color: #333;
+}
+.results-table {
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.results-table th, .results-table td {
+    padding: 12px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.results-table thead {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background-color: #f4f4f4;
+}
+
+.results-table tbody tr:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+.item1 {
+    grid-area: 1 / 1 / 3 / 2;     /* Same grid area */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f0f8ff;          /* Light blue background */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s;
+}
+.item2 { 
+    grid-area: 1 / 2 / 2 / 3;  /* 1 row, 1 column */
+    background: #0074d9; 
+    color: white; 
+}
+
+.item3 { 
+    grid-area: 2 / 2 / 3 / 3;  /* 1 row, 1 column */
+    background: #28a745; 
+    color: white; 
+}
+
+.item4 { 
+    grid-area: 1 / 3 / 5 / 4;  /* Spans 4 rows, 1 column */
+    background: #dc3545; 
+    color: white; 
+}
+
+.item5 { 
+    grid-area: 3 / 1 / 5 / 3;  /* Spans 2 rows, 2 columns */
+    background: #ffc107; 
+    color: black; 
+}
+
+.patient-info {
+    width: 80%;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* ✅ Patient Details */
+.patient-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+}
+
+.patient-summary strong {
+    font-weight: bold;
+}
+
+.contact-info, .medical-summary, .recent-tests, .physician-notes {
+    background: #f2f2f2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* ✅ Medical Summary */
+.medical-summary h3,
+.recent-tests h3,
+.physician-notes h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.recent-tests p,
+.physician-notes p {
+    margin: 5px 0;
+}
+
+/* ✅ Normal Test Result Styling */
+.normal {
+    color: green;
+    font-weight: bold;
+}
+
+/* ✅ Patient Charts */
+.patient-charts {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.patient-charts img {
+    width: 30%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+/* ✅ Documents Section */
+.documents {
+    margin-top: 20px;
+    background: #e0efff;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.documents h3 {
+    margin-bottom: 10px;
+}
+
+.documents table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.documents table th, .documents table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ✅ Exit Button */
+.exit-btn {
+    display: block;
+    width: 100px;
+    margin: 20px auto;
+    padding: 10px;
+    text-align: center;
+    background: red;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.exit-btn:hover {
+    background: darkred;
+}
+

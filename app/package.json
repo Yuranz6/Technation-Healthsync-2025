@@ -1,0 +1,38 @@
+{
+  "name": "healthsync",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server",
+    "start-w-server": "concurrently \"node server.mjs\" \"npx http-server\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vermillion-Chen/Technation-Healthsync-2025.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Vermillion-Chen/Technation-Healthsync-2025/issues"
+  },
+  "homepage": "https://github.com/Vermillion-Chen/Technation-Healthsync-2025#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "http-server": "^14.1.1",
+    "font-awesome": "^4.7.0"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "font-awesome-icons": "^1.6.0"
+  }
+}

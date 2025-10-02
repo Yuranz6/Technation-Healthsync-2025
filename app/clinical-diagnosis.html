@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+    <title>Clinical Diagnosis - HealthSync AI</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        .user-info { 
+            background: linear-gradient(135deg, #74b9ff, #0984e3); 
+            color: white; 
+            padding: 20px; 
+            margin-bottom: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+        }
+        .user-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+        }
+        .user-info p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+            margin-top: -10px;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        .form-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e9ecef; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        textarea { 
+            height: 150px; 
+            resize: vertical; 
+            font-family: inherit;
+        }
+        .analyze-btn { 
+            background: linear-gradient(135deg, #00b894, #00a085); 
+            color: white; 
+            padding: 15px 40px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: 600;
+            width: 100%;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+        }
+        .analyze-btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
+        }
+        .analyze-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .save-btn { 
+            background: linear-gradient(135deg, #74b9ff, #0984e3); 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            flex: 1;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+        }
+        .save-btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(116, 185, 255, 0.4);
+        }
+        .save-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .results { 
+            margin-top: 30px; 
+            padding: 25px; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            display: none;
+            border-left: 4px solid #00b894;
+        }
+        .result-section { 
+            margin-bottom: 25px; 
+            padding: 20px; 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .result-section h3 { 
+            margin-top: 0; 
+            color: #2c3e50; 
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .result-section p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .result-section strong {
+            color: #2c3e50;
+        }
+        .recommendations ul { 
+            margin: 10px 0; 
+            padding-left: 20px; 
+        }
+        .recommendations li { 
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .status { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            display: none;
+            font-weight: 500;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .info { 
+            background: #d1ecf1; 
+            color: #0c5460; 
+            border: 1px solid #bee5eb; 
+        }
+        .confidence-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+        .urgency-low { background: #d1ecf1; color: #0c5460; }
+        .urgency-medium { background: #fff3cd; color: #856404; }
+        .urgency-high { background: #f8d7da; color: #721c24; }
+        .disease-tag {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin: 3px;
+        }
+        .symptom-tag {
+            display: inline-block;
+            background: #6c757d;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin: 2px;
+        }
+        @media (max-width: 768px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 AI Clinical Diagnosis</h1>
+            <p>Advanced AI-powered medical diagnosis using ClinicalBERT + XGBoost + RAG</p>
+        </div>
+        
+        <div id="user-info" class="user-info" style="display: none;">
+            <h3>Welcome, <span id="user-name"></span></h3>
+            <p><span id="user-role"></span> | <span id="user-organization"></span></p>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+        
+        <form id="clinical-form">
+            <div class="form-container">
+                <div class="form-section">
+                    <h3>👤 Patient Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patient-name">Full Name:</label>
+                            <input type="text" id="patient-name" name="patient-name" placeholder="Enter patient name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-dob">Date of Birth:</label>
+                            <input type="date" id="patient-dob" name="patient-dob" placeholder="yyyy-mm-dd" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patient-age">Age:</label>
+                            <input type="number" id="patient-age" name="patient-age" placeholder="Age" min="0" max="120" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="accompanied-by">Accompanied By:</label>
+                            <input type="text" id="accompanied-by" name="accompanied-by" placeholder="Name of accompanying person">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="relationship">Relationship:</label>
+                            <input type="text" id="relationship" name="relationship" placeholder="Relationship to patient">
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-gender">Gender:</label>
+                            <select id="patient-gender" name="patient-gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>🤱 Prenatal History</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prenatal-visit">First Prenatal Visit Date:</label>
+                            <input type="date" id="prenatal-visit" name="prenatal-visit" placeholder="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alcohol-consumption">Alcohol Consumption:</label>
+                            <input type="text" id="alcohol-consumption" name="alcohol-consumption" placeholder="Alcohol consumption details">
+                        </div>
+                        <div class="form-group">
+                            <label for="tobacco-use">Tobacco Use:</label>
+                            <input type="text" id="tobacco-use" name="tobacco-use" placeholder="Tobacco use details">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="street-drugs">Street Drugs:</label>
+                            <input type="text" id="street-drugs" name="street-drugs" placeholder="Street drug use details">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>🏥 Medical History</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stds">STDs (Specify):</label>
+                            <input type="text" id="stds" name="stds" placeholder="Specify any STDs">
+                        </div>
+                        <div class="form-group">
+                            <label for="hepatitis-b">Hepatitis B:</label>
+                            <select id="hepatitis-b" name="hepatitis-b">
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hiv">HIV:</label>
+                            <select id="hiv" name="hiv">
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birth-weight">Birth Weight:</label>
+                            <input type="text" id="birth-weight" name="birth-weight" placeholder="Birth weight">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="allergies">Allergies:</label>
+                            <input type="text" id="allergies" name="allergies" placeholder="List any known allergies">
+                        </div>
+                        <div class="form-group">
+                            <label for="prescriptions">Current/Previous Prescriptions:</label>
+                            <textarea id="prescriptions" name="prescriptions" rows="3" placeholder="List current and previous prescriptions"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>📏 Physical Exam</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="height">Height:</label>
+                            <input type="number" id="height" name="height" placeholder="Height" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="weight">Weight:</label>
+                            <input type="number" id="weight" name="weight" placeholder="Weight" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="head-circumference">Head Circumference:</label>
+                            <input type="number" id="head-circumference" name="head-circumference" placeholder="Head circumference" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="blood-pressure">Blood Pressure:</label>
+                            <input type="text" id="blood-pressure" name="blood-pressure" placeholder="e.g., 120/80">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="blood-glucose">Blood Glucose (mg/dL):</label>
+                            <input type="number" id="blood-glucose" name="blood-glucose" placeholder="Blood glucose level" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>📝 Clinical Notes</h3>
+                    <div class="form-group">
+                        <label for="clinical-notes">Detailed Clinical Notes:</label>
+                        <textarea id="clinical-notes" name="clinical-notes" placeholder="Enter detailed clinical notes, symptoms, medical history, and observations..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="known-allergies">Known Allergies:</label>
+                        <input type="text" id="known-allergies" name="known-allergies" placeholder="List any known allergies">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="medications">Current Medications:</label>
+                        <input type="text" id="medications" name="medications" placeholder="List current medications">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin: 20px 0;">
+                <button type="button" class="save-btn" id="save-btn" onclick="savePatientDataOnly()">
+                    💾 Save Patient Data
+                </button>
+                <button type="submit" class="analyze-btn" id="analyze-btn">
+                    🔬 Analyze with AI (ClinicalBERT + XGBoost + RAG)
+                </button>
+            </div>
+        </form>
+        
+        <div id="status" class="status"></div>
+        
+        <div id="results" class="results">
+            <div id="results-content"></div>
+        </div>
+    </div>
+
+    <!-- Supabase JavaScript SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = "https://hzcvnaqracbehsviqvoj.supabase.co/";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6Y3ZuYXFyYWNiZWhzdmlxdm9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMDcyNjgsImV4cCI6MjA3NDU4MzI2OH0.3fDkvg3glg83OldBzp1QtzFU2VANW5TziwtPJg0frVs";
+        
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Check login status and fetch patient data
+        async function checkLoginStatus() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                const displayName = userData.name || `${userData.firstName} ${userData.lastName}`;
+                const roleDisplay = userData.role ? userData.role.charAt(0).toUpperCase() + userData.role.slice(1) : 'User';
+                const organization = userData.organization || 'HealthSync AI';
+                
+                document.getElementById('user-name').textContent = displayName;
+                document.getElementById('user-role').textContent = roleDisplay;
+                document.getElementById('user-organization').textContent = organization;
+                document.getElementById('user-info').style.display = 'block';
+                
+                // Fetch patient data from Supabase
+                await fetchAndFillPatientData(userData);
+            } else {
+                window.location.href = '/login.html';
+            }
+        }
+        
+        // Fetch patient data from Supabase and pre-fill form
+        async function fetchAndFillPatientData(userData) {
+            try {
+                showStatus('🔄 Loading your patient data...', 'info');
+                
+                // Try Supabase first
+                try {
+                    // Test Supabase connection first
+                    const { data: testData, error: testError } = await supabaseClient
+                        .from('zyr-1')
+                        .select('count')
+                        .limit(1);
+                    
+                    if (testError) {
+                        throw new Error('Supabase connection failed');
+                    }
+                    
+                    // Query patient data from Supabase
+                    const { data, error } = await supabaseClient
+                        .from('zyr-1')
+                        .select('*')
+                        .eq('username', userData.username)
+                        .single();
+                    
+                    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+                        throw new Error('Supabase query failed');
+                    }
+                    
+                    if (data) {
+                        // Pre-fill form with existing patient data
+                        fillPatientForm(data);
+                        showStatus('✅ Patient data loaded from Supabase! You can modify any fields as needed.', 'success');
+                        return;
+                    }
+                } catch (supabaseError) {
+                    console.log('Supabase unavailable, trying local storage...', supabaseError);
+                }
+                
+                // Fallback to localStorage
+                const savedData = localStorage.getItem(`patient_data_${userData.username}`);
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    fillPatientForm(data);
+                    showStatus('✅ Patient data loaded from local storage! You can modify any fields as needed.', 'success');
+                } else {
+                    showStatus('ℹ️ No existing patient data found. Please fill out the form.', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Error fetching patient data:', error);
+                showStatus('⚠️ Could not load patient data. Please fill the form manually.', 'info');
+            }
+        }
+        
+        // Fill form with patient data
+        function fillPatientForm(patientData) {
+            // Map Supabase fields to form fields
+            const fieldMapping = {
+                'patient-name': patientData.name || patientData.patient_name,
+                'patient-dob': patientData.dob || patientData.date_of_birth,
+                'patient-age': patientData.age,
+                'accompanied-by': patientData.accompanied_by,
+                'relationship': patientData.relationship,
+                'prenatal-visit': patientData.prenatal_visit || patientData.first_prenatal_visit,
+                'alcohol-consumption': patientData.alcohol_consumption,
+                'tobacco-use': patientData.tobacco_use,
+                'street-drugs': patientData.street_drugs,
+                'stds': patientData.stds,
+                'hepatitis-b': patientData.hepatitis_b,
+                'hiv': patientData.hiv,
+                'birth-weight': patientData.birth_weight,
+                'allergies': patientData.allergies,
+                'prescriptions': patientData.prescriptions || patientData.current_prescriptions,
+                'height': patientData.height,
+                'weight': patientData.weight,
+                'head-circumference': patientData.head_circumference,
+                'clinical-notes': patientData.clinical_notes
+            };
+            
+            // Fill form fields
+            Object.entries(fieldMapping).forEach(([fieldId, value]) => {
+                const field = document.getElementById(fieldId);
+                if (field && value) {
+                    field.value = value;
+                }
+            });
+        }
+        
+        // Save patient data to Supabase and localStorage
+        async function savePatientData() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return;
+            
+            const formData = {
+                username: user.username,
+                name: document.getElementById('patient-name').value,
+                dob: document.getElementById('patient-dob').value,
+                age: parseInt(document.getElementById('patient-age').value),
+                accompanied_by: document.getElementById('accompanied-by').value,
+                relationship: document.getElementById('relationship').value,
+                prenatal_visit: document.getElementById('prenatal-visit').value,
+                alcohol_consumption: document.getElementById('alcohol-consumption').value,
+                tobacco_use: document.getElementById('tobacco-use').value,
+                street_drugs: document.getElementById('street-drugs').value,
+                stds: document.getElementById('stds').value,
+                hepatitis_b: document.getElementById('hepatitis-b').value,
+                hiv: document.getElementById('hiv').value,
+                birth_weight: document.getElementById('birth-weight').value,
+                allergies: document.getElementById('allergies').value,
+                prescriptions: document.getElementById('prescriptions').value,
+                height: parseFloat(document.getElementById('height').value) || null,
+                weight: parseFloat(document.getElementById('weight').value) || null,
+                head_circumference: parseFloat(document.getElementById('head-circumference').value) || null,
+                clinical_notes: document.getElementById('clinical-notes').value,
+                updated_at: new Date().toISOString()
+            };
+            
+            // Always save to localStorage as backup
+            localStorage.setItem(`patient_data_${user.username}`, JSON.stringify(formData));
+            console.log('Patient data saved to localStorage');
+            
+            // Try to save to Supabase
+            try {
+                // Check if patient data already exists
+                const { data: existingData } = await supabaseClient
+                    .from('zyr-1')
+                    .select('id')
+                    .eq('username', user.username)
+                    .single();
+                
+                if (existingData) {
+                    // Update existing record
+                    const { error } = await supabaseClient
+                        .from('zyr-1')
+                        .update(formData)
+                        .eq('username', user.username);
+                    
+                    if (error) throw error;
+                } else {
+                    // Insert new record
+                    const { error } = await supabaseClient
+                        .from('zyr-1')
+                        .insert([formData]);
+                    
+                    if (error) throw error;
+                }
+                
+                console.log('Patient data saved to Supabase successfully');
+                
+            } catch (error) {
+                console.log('Supabase save failed, data saved to localStorage only:', error);
+            }
+        }
+        
+        // Save patient data only (without analysis)
+        async function savePatientDataOnly() {
+            const button = document.getElementById('save-btn');
+            const originalText = button.innerHTML;
+            button.innerHTML = '💾 Saving...';
+            button.disabled = true;
+            
+            try {
+                await savePatientData();
+                showStatus('✅ Patient data saved successfully!', 'success');
+            } catch (error) {
+                console.error('Error saving patient data:', error);
+                showStatus('❌ Failed to save patient data. Please try again.', 'error');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+        
+        // Display status messages
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = message;
+        }
+        
+        // Perform AI analysis
+        async function performHybridAnalysis() {
+            const patientName = document.getElementById('patient-name').value;
+            const patientAge = parseInt(document.getElementById('patient-age').value);
+            const patientGender = document.getElementById('patient-gender').value;
+            const bloodPressure = document.getElementById('blood-pressure').value;
+            const bloodGlucose = parseFloat(document.getElementById('blood-glucose').value) || null;
+            const weight = parseFloat(document.getElementById('weight').value) || null;
+            const clinicalNotes = document.getElementById('clinical-notes').value;
+            const allergies = document.getElementById('known-allergies').value;
+            const medications = document.getElementById('medications').value;
+            
+            if (!clinicalNotes.trim()) {
+                showStatus('Please enter clinical notes', 'error');
+                return;
+            }
+            
+            // Validate required fields
+            if (!patientAge || isNaN(patientAge) || patientAge < 0 || patientAge > 120) {
+                showStatus('Please enter a valid age (0-120)', 'error');
+                return;
+            }
+            
+            if (!patientGender) {
+                showStatus('Please select a gender', 'error');
+                return;
+            }
+
+            // Show loading state
+            const button = document.getElementById('analyze-btn');
+            const originalText = button.innerHTML;
+            button.innerHTML = '🔄 Saving data and analyzing...';
+            button.disabled = true;
+            
+            // Save patient data to Supabase first
+            try {
+                await savePatientData();
+                console.log('Patient data saved successfully');
+            } catch (error) {
+                console.error('Error saving patient data:', error);
+                // Continue with analysis even if save fails
+            }
+            
+            // Update button text for analysis
+            button.innerHTML = '🔄 AI analyzing...';
+
+            // Prepare API data
+            const apiData = {
+                patient_data: {
+                    age: patientAge,
+                    gender: patientGender,
+                    blood_pressure: bloodPressure || null,
+                    blood_glucose: bloodGlucose,
+                    weight: weight,
+                    allergies: allergies || null,
+                    medications: medications || null
+                },
+                clinical_notes: clinicalNotes
+            };
+
+            console.log('Sending API data:', apiData);
+
+            try {
+                // Call API
+                console.log('Sending API request with data:', apiData);
+                
+                const response = await fetch('http://localhost:8000/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(apiData)
+                });
+                
+                console.log('API response status:', response.status);
+                console.log('API response ok:', response.ok);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+                    throw new Error(`API request failed: ${response.status} - ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('API response data:', result);
+                
+                // Display results
+                displayResults(result);
+                showStatus('Analysis completed successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Analysis failed:', error);
+                console.error('Error stack:', error.stack);
+                showStatus(`Analysis failed: ${error.message}`, 'error');
+            } finally {
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        // Display analysis results
+        function displayResults(result) {
+            const resultsContainer = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            
+            // Get primary diagnosis from fused results
+            const primaryDiagnosis = result.fused_results && result.fused_results.length > 0 
+                ? result.fused_results[0].disease_name || result.fused_results[0].name
+                : 'No specific diagnosis';
+            
+            // Calculate confidence score
+            const confidenceScore = result.confidence_score || result.confidence || 0;
+            
+            // Generate risk level styles
+            const riskLevel = confidenceScore > 0.7 ? 'High' : confidenceScore > 0.4 ? 'Medium' : 'Low';
+            const riskClass = riskLevel === 'Low' ? 'risk-low' : 
+                            riskLevel === 'Medium' ? 'risk-medium' : 'risk-high';
+            
+            let html = `
+                <div class="result-section">
+                    <h3>📊 Analysis Summary</h3>
+                    <p><strong>Primary Diagnosis:</strong> <span class="disease-tag">${primaryDiagnosis}</span></p>
+                    <p><strong>Risk Assessment:</strong> <span class="risk-badge ${riskClass}">${riskLevel} Risk</span></p>
+                    <p><strong>Confidence Score:</strong></p>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${confidenceScore * 100}%"></div>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>${(confidenceScore * 100).toFixed(1)}%</strong> confidence in diagnosis</p>
+                </div>
+                
+                <div class="result-section">
+                    <h3>🧠 ClinicalBERT Analysis</h3>
+                    <p><strong>Diseases Detected:</strong></p>
+                    <div style="margin: 10px 0;">
+                        ${result.clinical_bert_analysis && result.clinical_bert_analysis.diseases_detected && result.clinical_bert_analysis.diseases_detected.length > 0 ? 
+                            result.clinical_bert_analysis.diseases_detected.map(disease => `<span class="disease-tag">${disease.disease_name || disease.name || disease}</span>`).join('') : 
+                            result.clinical_analysis && result.clinical_analysis.diseases && result.clinical_analysis.diseases.length > 0 ?
+                            result.clinical_analysis.diseases.map(disease => `<span class="disease-tag">${disease.name || disease}</span>`).join('') :
+                            '<span style="color: #6c757d;">None detected</span>'}
+                    </div>
+                    <p><strong>Analysis Method:</strong> ${result.clinical_bert_analysis ? 'ClinicalBERT Analysis' : result.clinical_analysis ? result.clinical_analysis.analysis_method : 'ClinicalBERT Simulation'}</p>
+                </div>
+                
+                <div class="result-section">
+                    <h3>📈 XGBoost Risk Analysis</h3>
+                    <p><strong>Predictions:</strong></p>
+                    <div style="margin: 10px 0;">
+                        ${result.xgboost_analysis && result.xgboost_analysis.predictions && result.xgboost_analysis.predictions.length > 0 ? 
+                            result.xgboost_analysis.predictions.map(pred => 
+                                `<div style="margin: 5px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                                    <strong>${pred.disease_name || pred.name}</strong> - Score: ${(pred.score * 100).toFixed(1)}% 
+                                    <span class="risk-badge ${pred.risk_level === 'high' ? 'risk-high' : pred.risk_level === 'medium' ? 'risk-medium' : 'risk-low'}">${pred.risk_level}</span>
+                                </div>`
+                            ).join('') :
+                            result.structured_analysis && result.structured_analysis.predictions && result.structured_analysis.predictions.length > 0 ? 
+                            result.structured_analysis.predictions.map(pred => 
+                                `<div style="margin: 5px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                                    <strong>${pred.disease_name || pred.name}</strong> - Score: ${(pred.score * 100).toFixed(1)}% 
+                                    <span class="risk-badge ${pred.risk_level === 'high' ? 'risk-high' : pred.risk_level === 'medium' ? 'risk-medium' : 'risk-low'}">${pred.risk_level}</span>
+                                </div>`
+                            ).join('') : 
+                            '<span style="color: #6c757d;">No predictions available</span>'}
+                    </div>
+                    <p><strong>Analysis Method:</strong> ${result.xgboost_analysis ? 'XGBoost Analysis' : result.structured_analysis ? result.structured_analysis.analysis_method : 'XGBoost Simulation'}</p>
+                </div>
+                
+                <div class="result-section">
+                    <h3>🔍 RAG Knowledge Retrieval</h3>
+                    <p><strong>Knowledge Retrieved:</strong> ${result.rag_knowledge ? result.rag_knowledge.length : 0} diseases</p>
+                    
+                    ${result.rag_knowledge && result.rag_knowledge.length > 0 ? `
+                        <div style="margin: 15px 0;">
+                            <h4>📋 Medical Knowledge</h4>
+                            ${result.rag_knowledge.map(knowledge => `
+                                <div style="margin: 10px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
+                                    <h5 style="margin-top: 0; color: #2c3e50;">${knowledge.disease_name}</h5>
+                                    <p><strong>Symptoms:</strong> ${knowledge.symptoms ? knowledge.symptoms.join(', ') : 'N/A'}</p>
+                                    <p><strong>Risk Factors:</strong> ${knowledge.risk_factors ? knowledge.risk_factors.join(', ') : 'N/A'}</p>
+                                    <p><strong>Lab Indicators:</strong> ${knowledge.lab_indicators ? knowledge.lab_indicators.join(', ') : 'N/A'}</p>
+                                    <p><strong>Treatments:</strong> ${knowledge.treatments ? knowledge.treatments.join(', ') : 'N/A'}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: #6c757d;">No knowledge retrieved</p>'}
+                </div>
+                
+                <div class="result-section recommendations">
+                    <h3>💡 Recommendations</h3>
+                    <ul>
+                        ${result.recommendations && result.recommendations.length > 0 ? 
+                            result.recommendations.map(rec => {
+                                if (typeof rec === 'string') {
+                                    return `<li>${rec}</li>`;
+                                } else {
+                                    return `<li><strong>${rec.type || 'Recommendation'}:</strong> ${rec.content || rec} ${rec.details ? `(${rec.details.join(', ')})` : ''}</li>`;
+                                }
+                            }).join('') : 
+                            '<li>Continue monitoring patient condition</li><li>Schedule follow-up appointment</li>'}
+                    </ul>
+                </div>
+            `;
+            
+            resultsContent.innerHTML = html;
+            resultsContainer.style.display = 'block';
+            
+            // Scroll to results
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Form submission handling
+        document.getElementById('clinical-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            performHybridAnalysis();
+        });
+        
+        // Check login status on page load
+        window.addEventListener('load', checkLoginStatus);
+    </script>
+</body>
+</html>
+

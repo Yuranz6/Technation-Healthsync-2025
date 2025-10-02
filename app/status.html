@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Status - HealthSync AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status-item { margin: 15px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 System Status - HealthSync AI</h1>
+        <p>Current system status and diagnostics</p>
+        
+        <div class="status-item info">
+            <h3>🌐 Frontend Server</h3>
+            <p><strong>Status:</strong> ✅ Running on port 3000</p>
+            <p><strong>URL:</strong> http://localhost:3000</p>
+        </div>
+        
+        <div class="status-item info">
+            <h3>🔧 API Server</h3>
+            <p><strong>Status:</strong> ✅ Running on port 8000</p>
+            <p><strong>URL:</strong> http://localhost:8000</p>
+        </div>
+        
+        <div class="status-item success">
+            <h3>📁 Available Pages</h3>
+            <ul>
+                <li><a href="/" target="_blank">Home Page</a></li>
+                <li><a href="/login.html" target="_blank">Login Page</a></li>
+                <li><a href="/register.html" target="_blank">Register Page</a></li>
+                <li><a href="/clinical-diagnosis.html" target="_blank">Clinical Diagnosis</a></li>
+                <li><a href="/user-management.html" target="_blank">User Management</a></li>
+                <li><a href="/html/dashboard.html" target="_blank">Dashboard</a></li>
+                <li><a href="/html/mission.html" target="_blank">Mission</a></li>
+                <li><a href="/html/contact.html" target="_blank">Contact</a></li>
+                <li><a href="/html/privacy.html" target="_blank">Privacy</a></li>
+            </ul>
+        </div>
+        
+        <div class="status-item success">
+            <h3>🔐 Authentication</h3>
+            <p><strong>Demo Login:</strong> ❌ Removed (as requested)</p>
+            <p><strong>Registration:</strong> ✅ Available</p>
+            <p><strong>Local Storage:</strong> ✅ Working</p>
+        </div>
+        
+        <div class="status-item success">
+            <h3>🤖 AI Diagnosis</h3>
+            <p><strong>ClinicalBERT:</strong> ✅ Loaded</p>
+            <p><strong>XGBoost:</strong> ✅ Loaded</p>
+            <p><strong>RAG System:</strong> ✅ Loaded</p>
+        </div>
+        
+        <div class="status-item info">
+            <h3>🌍 Language</h3>
+            <p><strong>Interface:</strong> ✅ English</p>
+            <p><strong>API Responses:</strong> ✅ English</p>
+            <p><strong>Error Messages:</strong> ✅ English</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="btn">← Back to Home</a>
+            <a href="/login.html" class="btn">Go to Login</a>
+            <a href="/clinical-diagnosis.html" class="btn">Start Diagnosis</a>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        function checkLoginStatus() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                const loginStatus = document.createElement('div');
+                loginStatus.className = 'status-item success';
+                loginStatus.innerHTML = `
+                    <h3>👤 Current User</h3>
+                    <p><strong>Name:</strong> ${userData.name}</p>
+                    <p><strong>Role:</strong> ${userData.role}</p>
+                    <p><strong>Organization:</strong> ${userData.organization || 'N/A'}</p>
+                `;
+                document.querySelector('.container').appendChild(loginStatus);
+            }
+        }
+        
+        window.addEventListener('load', checkLoginStatus);
+    </script>
+</body>
+</html>

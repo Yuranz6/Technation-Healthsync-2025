@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+    <title>Login - HealthSync AI</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 style="text-align: center; color: #007bff; margin-bottom: 30px;">🔐 HealthSync AI Login</h1>
+        
+        
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        
+        <div id="status" class="status"></div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <p><a href="/" style="color: #007bff; text-decoration: none;">← Back to Home</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Get user database (from localStorage only)
+        function getUsers() {
+            // Get registered users from localStorage
+            const registeredUsers = JSON.parse(localStorage.getItem('users') || '{}');
+            return registeredUsers;
+        }
+        
+        // Login form handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            performLogin();
+        });
+        
+        // Perform login
+        function performLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const statusDiv = document.getElementById('status');
+            
+            // Show loading state
+            statusDiv.className = 'status';
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '🔄 Logging in...';
+            
+            // Simulate login validation
+            setTimeout(() => {
+                // Get user database
+                const users = getUsers();
+                
+                if (users[username] && users[username].password === password) {
+                    // Login successful
+                    const user = users[username];
+                    localStorage.setItem('user', JSON.stringify({
+                        username: username,
+                        name: user.name,
+                        role: user.role,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        organization: user.organization,
+                        loginTime: new Date().toISOString()
+                    }));
+                    
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ Login successful! Redirecting...';
+                    
+                    // Redirect to Clinical Diagnosis page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/clinical-diagnosis.html';
+                    }, 2000);
+                    
+                } else {
+                    // Login failed
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = '❌ Invalid username or password';
+                }
+            }, 1000);
+        }
+        
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.getElementById('status').className = 'status success';
+                document.getElementById('status').style.display = 'block';
+                document.getElementById('status').innerHTML = `✅ Already logged in as ${userData.name}. Redirecting...`;
+                
+                setTimeout(() => {
+                    window.location.href = '/clinical-diagnosis.html';
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

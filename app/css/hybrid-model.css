@@ -1,0 +1,576 @@
+/* 混合模型系统样式 */
+
+.hybrid-model-status {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.hybrid-model-status.connected {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.hybrid-model-status.local {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.hybrid-model-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.hybrid-analyze-btn {
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+}
+
+.hybrid-analyze-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(111, 66, 193, 0.4);
+}
+
+.hybrid-analyze-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hybrid-analysis-results {
+    margin: 20px 0;
+    padding: 0;
+}
+
+.hybrid-analysis-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.hybrid-analysis-card h3 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid #6f42c1;
+    padding-bottom: 10px;
+}
+
+.analysis-subtitle {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.analysis-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+}
+
+.analysis-overview > div {
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.overall-confidence {
+    font-size: 16px;
+}
+
+.model-sources {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.confidence-high {
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.confidence-medium {
+    color: #fd7e14;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.confidence-low {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.fused-results {
+    margin: 20px 0;
+}
+
+.fused-results h4 {
+    color: #2c3e50;
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.disease-result {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-left: 4px solid #6f42c1;
+    transition: transform 0.2s ease;
+}
+
+.disease-result:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.disease-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.disease-header h5 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.disease-score {
+    background: linear-gradient(135deg, #6f42c1, #e83e8c);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.confidence-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.confidence-badge.confidence-high {
+    background-color: #dc3545;
+    color: white;
+}
+
+.confidence-badge.confidence-medium {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.confidence-badge.confidence-low {
+    background-color: #28a745;
+    color: white;
+}
+
+.matched-symptoms {
+    margin: 12px 0;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #17a2b8;
+}
+
+.matched-symptoms strong {
+    color: #495057;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.symptoms {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.contributing-factors {
+    margin: 12px 0;
+    padding: 8px 12px;
+    background: #fff3cd;
+    border-radius: 6px;
+    border-left: 3px solid #ffc107;
+}
+
+.contributing-factors strong {
+    color: #856404;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.contributing-factors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contributing-factors li {
+    padding: 4px 8px;
+    margin: 2px 0;
+    background: white;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.rag-knowledge {
+    margin: 20px 0;
+    padding: 16px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rag-knowledge h4 {
+    color: #2c3e50;
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.knowledge-item {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #28a745;
+}
+
+.knowledge-item h5 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.knowledge-details > div {
+    margin: 8px 0;
+    padding: 6px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.knowledge-details strong {
+    color: #495057;
+    margin-right: 8px;
+}
+
+.recommendations {
+    margin: 20px 0;
+    padding: 16px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.recommendations h4 {
+    color: #2c3e50;
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.recommendation-item {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #6c757d;
+}
+
+.recommendation-item.priority-high {
+    border-left-color: #dc3545;
+    background: #fff5f5;
+}
+
+.recommendation-item.priority-medium {
+    border-left-color: #fd7e14;
+    background: #fff8f0;
+}
+
+.recommendation-item.priority-low {
+    border-left-color: #28a745;
+    background: #f8fff8;
+}
+
+.rec-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.rec-header strong {
+    color: #2c3e50;
+    flex: 1;
+}
+
+.priority-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.priority-badge.priority-high {
+    background-color: #dc3545;
+    color: white;
+}
+
+.priority-badge.priority-medium {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.priority-badge.priority-low {
+    background-color: #28a745;
+    color: white;
+}
+
+.recommendation-item ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recommendation-item li {
+    padding: 6px 12px;
+    margin: 4px 0;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.no-results {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.analysis-notes {
+    margin-top: 24px;
+    padding: 16px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.analysis-notes h4 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.analysis-notes ul {
+    list-style: none;
+    padding: 0;
+}
+
+.analysis-notes li {
+    padding: 8px 12px;
+    margin: 6px 0;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #6c757d;
+    color: #495057;
+    font-size: 14px;
+}
+
+.analysis-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    text-align: center;
+}
+
+.analysis-error h3 {
+    margin-top: 0;
+    color: #721c24;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .analysis-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .hybrid-analysis-card {
+        padding: 16px;
+        margin: 10px;
+    }
+    
+    .hybrid-model-status {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin: 10px;
+        display: inline-block;
+    }
+    
+    .disease-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .disease-header h5 {
+        font-size: 16px;
+    }
+    
+    .rec-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* 动画效果 */
+.hybrid-analysis-card {
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.disease-result {
+    animation: fadeInLeft 0.3s ease-out;
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.knowledge-item {
+    animation: fadeInRight 0.3s ease-out;
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 加载动画 */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 与现有样式集成 */
+.patient-form .hybrid-analyze-btn {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    display: block;
+}
+
+.dashboard .hybrid-analysis-results {
+    margin: 20px 0;
+}
+
+/* 状态指示器 */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-indicator.connected {
+    background-color: #28a745;
+    box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+}
+
+.status-indicator.local {
+    background-color: #ffc107;
+    box-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
+}
+
+.status-indicator.error {
+    background-color: #dc3545;
+    box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
+}

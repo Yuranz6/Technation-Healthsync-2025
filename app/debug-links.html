@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Links - HealthSync AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .link-test { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Debug Links - HealthSync AI</h1>
+        <p>Testing all system links and routes</p>
+        
+        <div id="link-results"></div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="btn">← Back to Home</a>
+            <a href="/test-system.html" class="btn">System Test</a>
+        </div>
+    </div>
+
+    <script>
+        const links = [
+            { name: 'Home', url: '/' },
+            { name: 'Login', url: '/login.html' },
+            { name: 'Register', url: '/register.html' },
+            { name: 'Clinical Diagnosis', url: '/clinical-diagnosis.html' },
+            { name: 'User Management', url: '/user-management.html' },
+            { name: 'Dashboard', url: '/html/dashboard.html' },
+            { name: 'Mission', url: '/html/mission.html' },
+            { name: 'Contact', url: '/html/contact.html' },
+            { name: 'Privacy', url: '/html/privacy.html' },
+            { name: 'API Health', url: 'http://localhost:8000/health' }
+        ];
+        
+        async function testLink(link) {
+            try {
+                const response = await fetch(link.url);
+                if (response.ok) {
+                    return { success: true, status: response.status };
+                } else {
+                    return { success: false, status: response.status, error: `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testAllLinks() {
+            const resultsDiv = document.getElementById('link-results');
+            let html = '';
+            
+            for (const link of links) {
+                const result = await testLink(link);
+                const className = result.success ? 'success' : 'error';
+                const statusText = result.success ? 
+                    `✅ Working (${result.status})` : 
+                    `❌ Error: ${result.error}`;
+                
+                html += `
+                    <div class="link-test ${className}">
+                        <strong>${link.name}:</strong> ${link.url}<br>
+                        <span>${statusText}</span>
+                    </div>
+                `;
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        window.addEventListener('load', testAllLinks);
+    </script>
+</body>
+</html>

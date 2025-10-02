@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+	<title>Physician Dashboard - Empathy Canada</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <script type='module' src='/js/main.js'></script>
+    <script type='module' src='/js/dashboard.js'></script>
+    <!-- Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script src="/js/auth0-config.js"></script>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div id="navbar-container"></div>
+    <script>
+        fetch("/components/navbar.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading navbar:", error));
+    </script>
+
+    <!-- ✅ Page Content Wrapper -->
+    <div class="main-content">
+        <!-- Auth0 User Info -->
+        <div id="user-info" style="display: none; background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <span id="user-name"></span>
+            <button onclick="auth0Functions.logout()" style="float: right; background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px;">Logout</button>
+        </div>
+        
+        <section class="dashboard-container">
+            <h1>Patients</h1>
+
+            <table class="patient-table" id="patientsTable">
+                <thead>
+                    <tr>
+                        <th>UHID</th>
+                        <th>Patient Name</th>
+                        <th>Age</th>
+                        <th>Sex</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Last Visit Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically loaded-->
+                </tbody>
+            </table>
+        </section>
+    </div> 
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script>
+        fetch("/components/footer.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading footer:", error));
+    </script>
+
+    <!-- Auth0 Initialization -->
+    <script>
+        async function initializeAuth() {
+            try {
+                // 初始化Auth0
+                await auth0Functions.initAuth0();
+                
+                // 处理登录回调
+                const handledCallback = await auth0Functions.handleAuthCallback();
+                
+                // 检查用户是否已登录
+                const isLoggedIn = await auth0Functions.isAuthenticated();
+                
+                if (isLoggedIn) {
+                    // 显示用户信息
+                    const user = await auth0Functions.getUser();
+                    if (user) {
+                        document.getElementById('user-name').textContent = `Welcome, ${user.name || user.email}`;
+                        document.getElementById('user-info').style.display = 'block';
+                    }
+                } else {
+                    // 重定向到登录页面
+                    window.location.href = '/index.html';
+                }
+            } catch (error) {
+                console.error('Auth initialization failed:', error);
+                // 重定向到登录页面
+                window.location.href = '/index.html';
+            }
+        }
+        
+        // 页面加载完成后初始化Auth
+        document.addEventListener('DOMContentLoaded', initializeAuth);
+    </script>
+
+</body>
+</html>

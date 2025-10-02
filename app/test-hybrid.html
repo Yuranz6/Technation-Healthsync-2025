@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>混合模型测试页面</title>
+    <link href="/css/hybrid-model.css" rel="stylesheet">
+    <script src="/js/hybrid-model.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-form {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .test-button:hover {
+            opacity: 0.9;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧠 混合模型疾病诊断测试</h1>
+        <p>这是一个简化的测试页面，用于验证ClinicalBERT + XGBoost + RAG混合模型的功能。</p>
+        
+        <div class="test-form">
+            <div class="form-group">
+                <label for="test-age">年龄:</label>
+                <input type="number" id="test-age" value="45" min="0" max="120">
+            </div>
+            
+            <div class="form-group">
+                <label for="test-gender">性别:</label>
+                <select id="test-gender" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="Male">男性</option>
+                    <option value="Female">女性</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="test-bp">血压 (mmHg):</label>
+                <input type="text" id="test-bp" value="140/90" placeholder="例如: 140/90">
+            </div>
+            
+            <div class="form-group">
+                <label for="test-cholesterol">总胆固醇 (mg/dL):</label>
+                <input type="number" id="test-cholesterol" value="240" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <label for="test-clinical-notes">临床笔记:</label>
+                <textarea id="test-clinical-notes" placeholder="输入临床观察、症状或病历描述...">患者主诉胸痛、胸闷，伴有心悸和气短。既往有高血压病史，吸烟20年。体检发现血压150/95mmHg，心率90次/分，心律不齐。实验室检查显示总胆固醇240mg/dL，LDL 160mg/dL。</textarea>
+            </div>
+            
+            <button class="test-button" onclick="runTest()">🧠 开始混合模型分析</button>
+        </div>
+        
+        <div id="test-status"></div>
+        <div id="hybrid-analysis-results"></div>
+    </div>
+
+    <script>
+        // 等待混合模型系统初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 检查混合模型系统状态...');
+            
+            // 多次检查，因为初始化可能需要时间
+            let checkCount = 0;
+            const maxChecks = 10;
+            
+            const checkSystem = () => {
+                checkCount++;
+                console.log(`检查第 ${checkCount} 次...`);
+                
+                if (window.hybridModelSystem) {
+                    console.log('✅ 混合模型系统已就绪');
+                    showStatus('✅ 混合模型系统已就绪', 'success');
+                } else if (checkCount < maxChecks) {
+                    console.log('⏳ 等待混合模型系统初始化...');
+                    showStatus('⏳ 等待混合模型系统初始化...', 'success');
+                    setTimeout(checkSystem, 500);
+                } else {
+                    console.error('❌ 混合模型系统初始化超时');
+                    showStatus('❌ 混合模型系统未初始化', 'error');
+                }
+            };
+            
+            // 开始检查
+            setTimeout(checkSystem, 1000);
+        });
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function runTest() {
+            showStatus('🔄 正在进行分析...', 'success');
+            
+            try {
+                // 收集测试数据
+                const testData = {
+                    age: parseInt(document.getElementById('test-age').value),
+                    gender: document.getElementById('test-gender').value,
+                    blood_pressure: document.getElementById('test-bp').value,
+                    cholesterol: parseFloat(document.getElementById('test-cholesterol').value),
+                    clinical_notes: document.getElementById('test-clinical-notes').value
+                };
+                
+                console.log('测试数据:', testData);
+                
+                // 直接调用API，不依赖混合模型系统
+                const response = await fetch('http://localhost:8000/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('分析结果:', result);
+                
+                // 显示结果
+                displayResults(result);
+                showStatus('✅ 分析完成！', 'success');
+                
+            } catch (error) {
+                console.error('测试失败:', error);
+                showStatus(`❌ 分析失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function displayResults(result) {
+            const resultsContainer = document.getElementById('hybrid-analysis-results');
+            
+            const html = `
+                <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3>🧠 混合模型分析结果</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4>📊 综合诊断</h4>
+                        <p><strong>主要诊断:</strong> ${result.fusion_result.primary_diagnosis}</p>
+                        <p><strong>风险等级:</strong> ${result.fusion_result.risk_assessment}</p>
+                        <p><strong>置信度:</strong> ${(result.confidence_score * 100).toFixed(1)}%</p>
+                        <p><strong>紧急程度:</strong> ${result.fusion_result.urgency}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4>🔬 ClinicalBERT分析</h4>
+                        <p><strong>检测到的疾病:</strong> ${result.clinical_bert_analysis.diseases_detected.join(', ')}</p>
+                        <p><strong>识别的症状:</strong> ${result.clinical_bert_analysis.symptoms_identified.join(', ')}</p>
+                        <p><strong>置信度:</strong> ${(result.clinical_bert_analysis.confidence * 100).toFixed(1)}%</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4>📈 XGBoost风险评估</h4>
+                        <p><strong>风险评分:</strong> ${(result.xgboost_analysis.risk_score * 100).toFixed(1)}%</p>
+                        <p><strong>风险因素:</strong> ${result.xgboost_analysis.risk_factors.join(', ')}</p>
+                        <p><strong>心血管风险:</strong> ${(result.xgboost_analysis.predictions.cardiovascular_risk * 100).toFixed(1)}%</p>
+                        <p><strong>糖尿病风险:</strong> ${(result.xgboost_analysis.predictions.diabetes_risk * 100).toFixed(1)}%</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4>📚 RAG医疗指南</h4>
+                        <ul>
+                            ${result.rag_insights.guidelines.map(guideline => `<li>${guideline}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4>💡 智能建议</h4>
+                        <ul>
+                            ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

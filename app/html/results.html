@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+	<title>Patient Results - Empathy Canada</title>
+    <link href="/css/styles.css" rel="stylesheet">
+    <script type='module' src='/js/main.js'></script>
+    <script type='module' src='/js/results.js'></script>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div id="navbar-container"></div>
+    <script>
+        fetch("/components/navbar.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("navbar-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading navbar:", error));
+    </script>
+
+    <!-- ✅ Patient Information -->
+    <div class="main-content">
+        <!-- <section class="patient-info-grid">
+            <div class="patient-info-grid-item patient-summary-item">
+                <div class="card">
+                    <img src="/assets/blankProfile.jpg" alt="Profile Picture" class="profile-pic">
+                    <h2><span id="patientName"></h2>
+                    <a href="#" class="phone-number"><span id="patientPhone"></a>
+                    <div class="patient-info-details">
+                        <p><strong>Age :</strong><span id="patientAge"> Years</p>
+                        <p><strong>Sex :</strong><span id="patientSex"></p>
+                        <p><strong>Blood Group :</strong> O+</p>
+                        <p><strong>Allergies :</strong> 1.78</p>
+                    </div>
+                </div>
+            </div>
+            <div class="patient-info-grid-item item2">2</div>
+            <div class="patient-info-grid-item patient-prescription-item">
+                <h2>Current Medications: </h2>
+                    <table class="results-table" id="prescriptionTable">
+                        <thead>
+                            <tr>
+                                <th>Prescription ID</th><th>Drug</th><th>Dosage</th><th>Prescriber</th><th>Frequency</th>
+                                <th>Start Date</th><th>End Date</th><th>Status</th><th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table><span id="prescriptions"></span>
+            </div>
+            <div class="patient-info-grid-item item4">Visits</div>
+            <div class="patient-info-grid-item item5">Tests Results?</div>
+        </section> -->
+        <section class="patient-info">
+            <h2>Patient Information: <span id="patientName"></h2>
+
+            <div class="patient-summary">
+                <div class="patient-details">
+                    <p><strong>Age:</strong> <span id="patientAge"></span></p>
+                    <p><strong>Sex:</strong> <span id="patientSex"></span></p>
+                    <strong>Allergies:</strong> <span id="patientAllergies"></span>
+                    <strong>Blood Type:</strong> <span id="patientBloodType"></span>
+                </div>
+                <div class="contact-info">
+                    <strong>Phone Number:</strong> <span id="patientPhone"></span>
+                    <strong>Email:</strong> <span id="patientEmail"></span><br>
+                    <strong>Emergency Contact:</strong> Michael Lin, Father, (555) 987-6543  
+                </div>
+                <div class="medical-summary">
+                    <h3>Medical History Summary</h3>
+                    <ul>
+                        
+                        <li>Current Medications: 
+                            <table class="results-table" id="prescriptionTable">
+                                <thead>
+                                    <tr>
+                                        <th>Prescription ID</th><th>Drug</th><th>Dosage</th><th>Prescriber</th><th>Frequency</th>
+                                        <th>Start Date</th><th>End Date</th><th>Status</th><th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically loaded-->
+                                </tbody>
+                            </table><span id="prescriptions"></span></li>
+                        <li>Current Conditions: 
+                            <table class="results-table" id="diagnosisTable">
+                                <thead>
+                                    <tr>
+                                        <th>Diagnosis ID</th><th>Condition</th><th>Visit ID</th><th>Chronicity</th><th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamically loaded-->
+                                </tbody>
+                            </table><span id="prescriptions"></span></li>
+                    </ul>
+                </div>
+                <div class="recent-tests">
+                    <h3>Recent Tests (15/09/2024)</h3>
+                    <p><strong>Blood Glucose:</strong> 90 mg/dL</p>
+                    <p><strong>Cholesterol:</strong> 180 mg/dL</p>
+                    <p><strong>Hemoglobin:</strong> 14 g/dL</p>
+                    <p><strong>Report:</strong> <span class="normal">Normal</span></p>
+                </div>
+                <div class="physician-notes">
+                    <h3>Physician’s Notes</h3>
+                    <p>Last Visit: September 10, 2023 - Routine check-up</p>
+                    <p>Next Appointment: March 15, 2024 - Annual Physical</p>
+                </div>
+            </div>
+
+            <!-- ✅ Graphs -->
+            <div class="patient-charts">
+                <img src="/assets/BMI.png" alt="BMI Comparison">
+                <img src="/assets/Height.png" alt="Height Comparison">
+                <img src="/assets/blood.png" alt="Blood Test Comparison">
+            </div>
+
+            <!-- ✅ Documents -->
+            <div class="documents">
+                <h3>Documents</h3>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Report - Provider</th>
+                    </tr>
+                    <tr>
+                        <td>Dec 12, 2024</td>
+                        <td>MRI results - Brigham Hospital</td>
+                    </tr>
+                    <tr>
+                        <td>September 15, 2024</td>
+                        <td>Blood Test - Happy Vein Clinic</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ✅ Exit Button -->
+            <a href="/html/dashboard.html" class="exit-btn">Exit</a>
+        </section>
+    </div> 
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+    <script>
+        fetch("/components/footer.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("footer-container").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading footer:", error));
+    </script>
+
+</body>
+</html>
