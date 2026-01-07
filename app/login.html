@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
+    <link rel="icon" type="image/x-icon" href="./assets/logo.svg">
     <title>Login - HealthSync AI</title>
-    <link href="/css/styles.css" rel="stylesheet">
+    <link href="./css/styles.css" rel="stylesheet">
     <style>
         .login-container {
             max-width: 400px;
@@ -102,7 +102,7 @@
         <div id="status" class="status"></div>
         
         <div style="text-align: center; margin-top: 20px;">
-            <p><a href="/" style="color: #007bff; text-decoration: none;">← Back to Home</a></p>
+            <p><a href="./" style="color: #007bff; text-decoration: none;">← Back to Home</a></p>
         </div>
     </div>
 
@@ -154,7 +154,7 @@
                     
                     // Redirect to Clinical Diagnosis page after 2 seconds
                     setTimeout(() => {
-                        window.location.href = '/clinical-diagnosis.html';
+                        window.location.href = './clinical-diagnosis.html';
                     }, 2000);
                     
                 } else {
@@ -175,7 +175,7 @@
                 document.getElementById('status').innerHTML = `✅ Already logged in as ${userData.name}. Redirecting...`;
                 
                 setTimeout(() => {
-                    window.location.href = '/clinical-diagnosis.html';
+                    window.location.href = './clinical-diagnosis.html';
                 }, 1500);
             }
         });
