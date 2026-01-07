@@ -33,11 +33,10 @@ const EnvConfig = {
                 backendApi: 'http://localhost:5001'
             };
         } else {
-            // Production URLs - Update these with your Render URLs
-            // Replace 'your-render-app-name' with your actual Render service name
+            // Production URLs - Render deployment
             return {
-                hybridModelApi: 'https://healthsync-hybrid-model.onrender.com',
-                backendApi: 'https://healthsync-backend.onrender.com'
+                hybridModelApi: 'https://technation-healthsync-2025.onrender.com',
+                backendApi: 'https://technation-healthsync-2025.onrender.com'  // Same service or update if separate
             };
         }
     },
