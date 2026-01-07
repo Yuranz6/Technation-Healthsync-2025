@@ -17,7 +17,7 @@ async function initializeSupabase() {
         } else {
             // Fallback detection
             if (!isLocal) {
-                backendApiUrl = 'https://healthsync-backend.onrender.com';
+                backendApiUrl = 'https://technation-healthsync-2025.onrender.com';
             }
         }
         

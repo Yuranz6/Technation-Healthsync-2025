@@ -12,7 +12,7 @@ if (typeof window !== 'undefined' && window.EnvConfig) {
     EnvConfig = {
         getHybridModelApiUrl: () => {
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            return isLocal ? 'http://localhost:8000' : 'https://healthsync-hybrid-model.onrender.com';
+            return isLocal ? 'http://localhost:8000' : 'https://technation-healthsync-2025.onrender.com';
         }
     };
 }
