@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/assets/logo.svg">
     <title>Clinical Diagnosis - HealthSync AI</title>
+    <script src="/js/env-config.js"></script>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -768,7 +769,14 @@
                 // Call API
                 console.log('Sending API request with data:', apiData);
                 
-                const response = await fetch('http://localhost:8000/analyze', {
+                // Use environment-aware API URL
+                const apiUrl = (typeof window !== 'undefined' && window.EnvConfig) 
+                    ? window.EnvConfig.getHybridModelApiUrl() 
+                    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                        ? 'http://localhost:8000' 
+                        : 'https://technation-healthsync-2025.onrender.com');
+                
+                const response = await fetch(`${apiUrl}/analyze`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

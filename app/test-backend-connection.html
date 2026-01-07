@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <script src="/js/env-config.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-item {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Backend Connection Test</h1>
+    
+    <div class="test-item info">
+        <h3>Environment Detection</h3>
+        <p><strong>Hostname:</strong> <span id="hostname"></span></p>
+        <p><strong>Is Local:</strong> <span id="isLocal"></span></p>
+        <p><strong>Is GitHub Pages:</strong> <span id="isGitHubPages"></span></p>
+        <p><strong>Environment:</strong> <span id="environment"></span></p>
+    </div>
+    
+    <div class="test-item info">
+        <h3>API URLs</h3>
+        <p><strong>Hybrid Model API:</strong> <span id="hybridApiUrl"></span></p>
+        <p><strong>Backend API:</strong> <span id="backendApiUrl"></span></p>
+    </div>
+    
+    <div class="test-item">
+        <h3>Test Backend Connection</h3>
+        <button onclick="testBackend()">Test Backend API (/keys)</button>
+        <button onclick="testHybridModel()">Test Hybrid Model API (/health)</button>
+        <div id="backendResult"></div>
+    </div>
+    
+    <div class="test-item">
+        <h3>Test Hybrid Model Analysis</h3>
+        <button onclick="testAnalysis()">Test /analyze Endpoint</button>
+        <div id="analysisResult"></div>
+    </div>
+    
+    <script>
+        // Display environment info
+        document.getElementById('hostname').textContent = window.location.hostname;
+        document.getElementById('isLocal').textContent = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        document.getElementById('isGitHubPages').textContent = (window.location.hostname.includes('github.io') || window.location.hostname.includes('github.com'));
+        
+        if (typeof window.EnvConfig !== 'undefined') {
+            document.getElementById('environment').textContent = window.EnvConfig.getEnvironment();
+            document.getElementById('hybridApiUrl').textContent = window.EnvConfig.getHybridModelApiUrl();
+            document.getElementById('backendApiUrl').textContent = window.EnvConfig.getBackendApiUrl();
+        } else {
+            document.getElementById('environment').textContent = 'env-config.js not loaded!';
+            document.getElementById('hybridApiUrl').textContent = 'N/A';
+            document.getElementById('backendApiUrl').textContent = 'N/A';
+        }
+        
+        async function testBackend() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const backendUrl = typeof window.EnvConfig !== 'undefined' 
+                    ? window.EnvConfig.getBackendApiUrl() 
+                    : 'https://technation-healthsync-2025.onrender.com';
+                
+                const response = await fetch(`${backendUrl}/keys`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Backend API Connected!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Backend API Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Check console for details.</p>
+                    </div>
+                `;
+                console.error('Backend test error:', error);
+            }
+        }
+        
+        async function testHybridModel() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const apiUrl = typeof window.EnvConfig !== 'undefined' 
+                    ? window.EnvConfig.getHybridModelApiUrl() 
+                    : 'https://technation-healthsync-2025.onrender.com';
+                
+                const response = await fetch(`${apiUrl}/health`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Hybrid Model API Connected!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Hybrid Model API Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Check console for details.</p>
+                    </div>
+                `;
+                console.error('Hybrid model test error:', error);
+            }
+        }
+        
+        async function testAnalysis() {
+            const resultDiv = document.getElementById('analysisResult');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const apiUrl = typeof window.EnvConfig !== 'undefined' 
+                    ? window.EnvConfig.getHybridModelApiUrl() 
+                    : 'https://technation-healthsync-2025.onrender.com';
+                
+                const testData = {
+                    age: 45,
+                    gender: 'Male',
+                    clinical_notes: 'Patient presents with chest pain and shortness of breath.'
+                };
+                
+                const response = await fetch(`${apiUrl}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Analysis Endpoint Working!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Analysis Endpoint Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Check console for details.</p>
+                    </div>
+                `;
+                console.error('Analysis test error:', error);
+            }
+        }
+        
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testHybridModel();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+
