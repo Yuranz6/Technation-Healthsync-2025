@@ -21,32 +21,44 @@ import csv
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize ClinicalBERT model
-logger.info("Loading ClinicalBERT model...")
-try:
-    # Try to use local model if path is provided and exists
-    local_model_path = os.environ.get("LOCAL_MODEL_PATH")
-    if local_model_path and os.path.exists(local_model_path):
-        logger.info(f"Loading local model from: {local_model_path}")
-        tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")  # Use pre-trained tokenizer
-        model = AutoModel.from_pretrained(local_model_path)
-        logger.info("Local ClinicalBERT model loaded successfully")
-    else:
-        # Fallback to online model
-        logger.info("Local model path not found or not set, using online model...")
-        tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
-        model = AutoModel.from_pretrained("medicalai/ClinicalBERT")
-        logger.info("Online ClinicalBERT model loaded successfully")
-except Exception as e:
-    logger.warning(f"Model loading failed: {e}")
-    logger.info("Falling back to online model...")
+# Initialize ClinicalBERT model - Lazy loading to save memory
+logger.info("Initializing ClinicalBERT model (lazy loading)...")
+tokenizer = None
+model = None
+model_loaded = False
+
+def load_model():
+    """Lazy load the model only when needed"""
+    global tokenizer, model, model_loaded
+    if model_loaded:
+        return tokenizer, model
+    
     try:
-        tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
-        model = AutoModel.from_pretrained("medicalai/ClinicalBERT")
-        logger.info("Online ClinicalBERT model loaded successfully")
-    except Exception as e2:
-        logger.error(f"Failed to load online model: {e2}")
-        raise
+        # Try to use local model if path is provided and exists
+        local_model_path = os.environ.get("LOCAL_MODEL_PATH")
+        if local_model_path and os.path.exists(local_model_path):
+            logger.info(f"Loading local model from: {local_model_path}")
+            tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
+            model = AutoModel.from_pretrained(local_model_path)
+            logger.info("Local ClinicalBERT model loaded successfully")
+        else:
+            # Fallback to online model with memory optimization
+            logger.info("Loading online model with memory optimization...")
+            tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
+            # Use low_cpu_mem_usage to reduce memory footprint
+            model = AutoModel.from_pretrained(
+                "medicalai/ClinicalBERT",
+                low_cpu_mem_usage=True,
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
+            )
+            logger.info("Online ClinicalBERT model loaded successfully")
+        model_loaded = True
+        return tokenizer, model
+    except Exception as e:
+        logger.warning(f"Model loading failed: {e}")
+        logger.warning("Will use fallback keyword-based analysis")
+        model_loaded = True  # Mark as loaded to prevent retry loops
+        return None, None
 
 app = FastAPI(
     title="Hybrid Model Disease Diagnosis API",
@@ -429,12 +441,19 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
             "analysis": "No clinical notes provided"
         }
     
+    # Try to load model if not loaded
+    current_tokenizer, current_model = load_model()
+    
+    # If model loading failed, use keyword-based fallback
+    if current_tokenizer is None or current_model is None:
+        return analyze_with_keywords(clinical_notes)
+    
     try:
         # Use ClinicalBERT for text encoding
-        inputs = tokenizer(clinical_notes, return_tensors="pt", truncation=True, max_length=512, padding=True)
+        inputs = current_tokenizer(clinical_notes, return_tensors="pt", truncation=True, max_length=512, padding=True)
         
         with torch.no_grad():
-            outputs = model(**inputs)
+            outputs = current_model(**inputs)
             # Safely get [CLS] token representation
             if hasattr(outputs, 'last_hidden_state') and outputs.last_hidden_state.size(1) > 0:
                 cls_embedding = outputs.last_hidden_state[:, 0, :]
@@ -515,45 +534,49 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
         
     except Exception as e:
         logger.error(f"ClinicalBERT analysis failed: {str(e)}")
-        # Fallback to simple keyword-based analysis
-        detected_diseases = []
-        identified_symptoms = []
-        clinical_notes_lower = clinical_notes.lower()
-        
-        # Simple keyword matching as fallback
-        if any(keyword in clinical_notes_lower for keyword in ["chest pain", "heart", "cardiac"]):
-            detected_diseases.append("Cardiovascular Disease")
-            identified_symptoms.append("chest pain")
-        
-        if any(keyword in clinical_notes_lower for keyword in ["diabetes", "glucose", "blood sugar"]):
-            detected_diseases.append("Diabetes")
-            identified_symptoms.append("glucose issues")
-        
-        if any(keyword in clinical_notes_lower for keyword in ["hypertension", "blood pressure", "high bp"]):
-            detected_diseases.append("Hypertension")
-            identified_symptoms.append("elevated blood pressure")
-        
-        # Ophthalmic disease detection
-        if any(keyword in clinical_notes_lower for keyword in ["eye", "ocular", "vision", "visual", "diplopia", "double vision", "eye weakness", "oculomotor", "palsy", "ptosis"]):
-            detected_diseases.append("Ophthalmic Disorder")
-            identified_symptoms.append("visual disturbance")
-        
-        # Neurological disease detection
-        if any(keyword in clinical_notes_lower for keyword in ["nerve", "neurological", "palsy", "paralysis", "weakness", "numbness", "tingling"]):
-            detected_diseases.append("Neurological Disorder")
-            identified_symptoms.append("nerve weakness")
-        
-        # Autoimmune disease detection
-        if any(keyword in clinical_notes_lower for keyword in ["prednisone", "steroid", "inflammation", "immune", "myasthenia"]):
-            detected_diseases.append("Autoimmune Disorder")
-            identified_symptoms.append("immune system involvement")
-        
-        return {
-            "diseases_detected": detected_diseases,
-            "symptoms_identified": identified_symptoms,
-            "confidence": 0.6,
-            "analysis": f"Fallback analysis completed, detected {len(detected_diseases)} diseases"
-        }
+        # Fallback to keyword-based analysis
+        return analyze_with_keywords(clinical_notes)
+
+def analyze_with_keywords(clinical_notes: str) -> Dict[str, Any]:
+    """Fallback keyword-based analysis when model is unavailable"""
+    detected_diseases = []
+    identified_symptoms = []
+    clinical_notes_lower = clinical_notes.lower()
+    
+    # Simple keyword matching as fallback
+    if any(keyword in clinical_notes_lower for keyword in ["chest pain", "heart", "cardiac", "chest tightness", "palpitations"]):
+        detected_diseases.append("Cardiovascular Disease")
+        identified_symptoms.append("chest pain")
+    
+    if any(keyword in clinical_notes_lower for keyword in ["diabetes", "glucose", "blood sugar", "excessive thirst", "frequent urination"]):
+        detected_diseases.append("Diabetes")
+        identified_symptoms.append("glucose issues")
+    
+    if any(keyword in clinical_notes_lower for keyword in ["hypertension", "blood pressure", "high bp", "elevated bp"]):
+        detected_diseases.append("Hypertension")
+        identified_symptoms.append("elevated blood pressure")
+    
+    # Ophthalmic disease detection
+    if any(keyword in clinical_notes_lower for keyword in ["eye", "ocular", "vision", "visual", "diplopia", "double vision", "eye weakness", "oculomotor", "palsy", "ptosis"]):
+        detected_diseases.append("Ophthalmic Disorder")
+        identified_symptoms.append("visual disturbance")
+    
+    # Neurological disease detection
+    if any(keyword in clinical_notes_lower for keyword in ["nerve", "neurological", "palsy", "paralysis", "weakness", "numbness", "tingling"]):
+        detected_diseases.append("Neurological Disorder")
+        identified_symptoms.append("nerve weakness")
+    
+    # Autoimmune disease detection
+    if any(keyword in clinical_notes_lower for keyword in ["prednisone", "steroid", "inflammation", "immune", "myasthenia"]):
+        detected_diseases.append("Autoimmune Disorder")
+        identified_symptoms.append("immune system involvement")
+    
+    return {
+        "diseases_detected": detected_diseases,
+        "symptoms_identified": identified_symptoms,
+        "confidence": 0.6,
+        "analysis": f"Keyword-based analysis completed, detected {len(detected_diseases)} diseases"
+    }
 
 # Simulate XGBoost analysis
 def analyze_with_xgboost(patient_data: PatientData) -> Dict[str, Any]:
@@ -695,14 +718,19 @@ async def root():
 
 @app.get("/health")
 async def health_check():
+    # Check if model is loaded
+    current_tokenizer, current_model = load_model()
+    model_status = "loaded" if (current_tokenizer is not None and current_model is not None) else "fallback_mode"
+    
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "models": {
-            "clinical_bert": "loaded",
+            "clinical_bert": model_status,
             "xgboost": "loaded", 
             "rag_system": "loaded"
-        }
+        },
+        "port": int(os.environ.get("PORT", 8000))
     }
 
 @app.post("/analyze", response_model=AnalysisResult)
@@ -776,4 +804,10 @@ async def get_models_status():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    logger.info(f"Starting server on 0.0.0.0:{port}")
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=port,
+        log_level="info"
+    )
