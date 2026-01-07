@@ -22,19 +22,31 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize ClinicalBERT model
-logger.info("Loading local ClinicalBERT model...")
+logger.info("Loading ClinicalBERT model...")
 try:
-    # Try to use local model
-    local_model_path = "/Users/zrb/Downloads/Technation-Healthsync-2025-main/local_model"
-    tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")  # Use pre-trained tokenizer
-    model = AutoModel.from_pretrained(local_model_path)
-    logger.info("Local ClinicalBERT model loaded successfully")
+    # Try to use local model if path is provided and exists
+    local_model_path = os.environ.get("LOCAL_MODEL_PATH")
+    if local_model_path and os.path.exists(local_model_path):
+        logger.info(f"Loading local model from: {local_model_path}")
+        tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")  # Use pre-trained tokenizer
+        model = AutoModel.from_pretrained(local_model_path)
+        logger.info("Local ClinicalBERT model loaded successfully")
+    else:
+        # Fallback to online model
+        logger.info("Local model path not found or not set, using online model...")
+        tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
+        model = AutoModel.from_pretrained("medicalai/ClinicalBERT")
+        logger.info("Online ClinicalBERT model loaded successfully")
 except Exception as e:
-    logger.warning(f"Local model loading failed: {e}")
+    logger.warning(f"Model loading failed: {e}")
     logger.info("Falling back to online model...")
-    tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
-    model = AutoModel.from_pretrained("medicalai/ClinicalBERT")
-    logger.info("Online ClinicalBERT model loaded successfully")
+    try:
+        tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
+        model = AutoModel.from_pretrained("medicalai/ClinicalBERT")
+        logger.info("Online ClinicalBERT model loaded successfully")
+    except Exception as e2:
+        logger.error(f"Failed to load online model: {e2}")
+        raise
 
 app = FastAPI(
     title="Hybrid Model Disease Diagnosis API",
@@ -763,4 +775,5 @@ async def get_models_status():
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

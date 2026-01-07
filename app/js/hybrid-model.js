@@ -3,9 +3,23 @@
  * Combining HuggingFace ClinicalBERT model and XGBoost for disease diagnosis
  */
 
+// Import environment config if available
+let EnvConfig;
+if (typeof window !== 'undefined' && window.EnvConfig) {
+    EnvConfig = window.EnvConfig;
+} else {
+    // Fallback if env-config.js not loaded
+    EnvConfig = {
+        getHybridModelApiUrl: () => {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            return isLocal ? 'http://localhost:8000' : 'https://healthsync-hybrid-model.onrender.com';
+        }
+    };
+}
+
 class HybridModelSystem {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:8000';
+        this.apiBaseUrl = EnvConfig.getHybridModelApiUrl();
         this.isConnected = false;
         this.medicalKnowledgeBase = this.initializeMedicalKB();
         this.init();
@@ -752,8 +766,9 @@ async function performHybridAnalysis() {
 
         console.log('Sending API data:', apiData);
 
-        // Call API directly
-        const response = await fetch('http://localhost:8000/analyze', {
+        // Call API directly - use environment-aware URL
+        const apiUrl = EnvConfig.getHybridModelApiUrl();
+        const response = await fetch(`${apiUrl}/analyze`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
