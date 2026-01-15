@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 600px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        .url-box {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 20px 0;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .links a {
+            display: block;
+            margin: 10px 0;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 404 - Page Not Found</h1>
+        <p><strong>您访问的页面不存在。</strong></p>
+        <p>GitHub Pages 项目页面的 URL 必须包含仓库名称。</p>
+        
+        <div class="url-box">
+            <strong>当前 URL:</strong><br>
+            <span id="currentUrl"></span>
+        </div>
+        
+        <div class="url-box" style="background: #d4edda; border: 1px solid #c3e6cb;">
+            <strong>正确的 URL 格式:</strong><br>
+            https://yuranz6.github.io/Technation-Healthsync-2025/[页面名称]
+        </div>
+        
+        <div class="links">
+            <h3>快速链接:</h3>
+            <a href="https://yuranz6.github.io/Technation-Healthsync-2025/">🏠 主页</a>
+            <a href="https://yuranz6.github.io/Technation-Healthsync-2025/login.html">🔐 登录</a>
+            <a href="https://yuranz6.github.io/Technation-Healthsync-2025/register.html">📝 注册</a>
+            <a href="https://yuranz6.github.io/Technation-Healthsync-2025/clinical-diagnosis.html">🧠 临床诊断</a>
+            <a href="https://yuranz6.github.io/Technation-Healthsync-2025/test-backend-connection.html">🔧 测试连接</a>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="https://yuranz6.github.io/Technation-Healthsync-2025/" class="btn">返回主页</a>
+        </div>
+    </div>
+    
+    <script>
+        // Display current URL
+        document.getElementById('currentUrl').textContent = window.location.href;
+        
+        // Try to redirect if we can detect the intended page
+        const path = window.location.pathname;
+        const repoName = 'Technation-Healthsync-2025';
+        
+        // If accessing root without repo name, redirect to correct root
+        if (path === '/' || path === '') {
+            // Already at root, but might be wrong root
+            if (!window.location.href.includes(repoName)) {
+                window.location.href = `https://yuranz6.github.io/${repoName}/`;
+            }
+        }
+        
+        // If accessing a page without repo name, try to redirect
+        const pageMatch = path.match(/\/([^\/]+\.html)$/);
+        if (pageMatch && !path.includes(repoName)) {
+            const pageName = pageMatch[1];
+            const correctUrl = `https://yuranz6.github.io/${repoName}/${pageName}`;
+            
+            // Show redirect message
+            const container = document.querySelector('.container');
+            const redirectMsg = document.createElement('p');
+            redirectMsg.style.cssText = 'background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;';
+            redirectMsg.innerHTML = `🔄 正在重定向到: <strong>${correctUrl}</strong>`;
+            container.insertBefore(redirectMsg, container.querySelector('.links'));
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = correctUrl;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+
