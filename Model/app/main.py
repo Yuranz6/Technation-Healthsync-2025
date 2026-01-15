@@ -342,12 +342,35 @@ class DataKnowledgeBase:
 # Initialize data KB at startup
 try:
     PROJECT_ROOT = Path(__file__).resolve().parents[2]
-    default_data_dir = PROJECT_ROOT / "data" / "output_data"
-    DATA_DIR = Path(os.environ.get("HEALTHSYNC_DATA_DIR", str(default_data_dir)))
-    data_kb = DataKnowledgeBase(DATA_DIR)
-    logger.info(f"Data-backed RAG enabled using directory: {DATA_DIR}")
+    # Try multiple possible data directory locations
+    possible_dirs = [
+        Path(os.environ.get("HEALTHSYNC_DATA_DIR", "")),
+        PROJECT_ROOT / "data" / "output_data",
+        PROJECT_ROOT / "data",
+        Path("/opt/render/project/src/data/output_data"),
+        Path("/opt/render/project/src/data"),
+    ]
+    
+    DATA_DIR = None
+    for data_dir in possible_dirs:
+        if data_dir and data_dir.exists() and data_dir.is_dir():
+            # Check if at least one CSV file exists in this directory
+            csv_files = list(data_dir.glob("*.csv"))
+            if csv_files:
+                DATA_DIR = data_dir
+                logger.info(f"Found data directory with {len(csv_files)} CSV files: {DATA_DIR}")
+                break
+    
+    if DATA_DIR:
+        data_kb = DataKnowledgeBase(DATA_DIR)
+        logger.info(f"Data-backed RAG enabled using directory: {DATA_DIR}")
+    else:
+        logger.warning("No data directory with CSV files found, RAG will use built-in knowledge base only")
+        logger.info(f"Searched in: {[str(d) for d in possible_dirs if d]}")
+        data_kb = None
 except Exception as e:
     logger.warning(f"Data-backed RAG initialization failed: {e}")
+    logger.info("RAG will use built-in knowledge base only")
     data_kb = None
 
 # Add CORS middleware
