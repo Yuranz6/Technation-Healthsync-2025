@@ -4,7 +4,7 @@ services:
     name: healthsync-hybrid-model
     env: python
     plan: free  # Note: If memory issues occur, the service will use keyword-based fallback mode
-    buildCommand: cd Model/app && pip install -r requirements.txt
+    buildCommand: cd Model/app && python -m pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.txt
     startCommand: cd Model/app && python main.py
     envVars:
       - key: PORT
