@@ -11,6 +11,8 @@ services:
         value: 8000
       - key: HEALTHSYNC_DATA_DIR
         value: /opt/render/project/src/data/output_data
+      - key: PYTHONUNBUFFERED
+        value: "1"
       - key: PYTHON_VERSION
         value: 3.11
       - key: TRANSFORMERS_OFFLINE
