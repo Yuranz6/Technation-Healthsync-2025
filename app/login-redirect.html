@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting to Login...</title>
+    <script>
+        // Get the repository name from the current path
+        const pathParts = window.location.pathname.split('/').filter(p => p);
+        const repoName = pathParts[0] || 'Technation-Healthsync-2025';
+        
+        // Redirect to the correct login page
+        if (window.location.hostname.includes('github.io')) {
+            window.location.href = `/${repoName}/login.html`;
+        } else {
+            window.location.href = './login.html';
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .message {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+        .message h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .message p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .url {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        <h1>🔄 正在重定向...</h1>
+        <p>如果您没有自动跳转，请点击下面的链接：</p>
+        <div class="url" id="correctUrl">正在加载...</div>
+        <p><a href="#" id="loginLink">点击这里访问登录页面</a></p>
+        <p style="margin-top: 30px; font-size: 14px; color: #999;">
+            <strong>提示：</strong> GitHub Pages 项目页面的 URL 必须包含仓库名称<br>
+            正确格式：<code>https://yuranz6.github.io/Technation-Healthsync-2025/login.html</code>
+        </p>
+    </div>
+    <script>
+        const pathParts = window.location.pathname.split('/').filter(p => p);
+        const repoName = pathParts[0] || 'Technation-Healthsync-2025';
+        const correctUrl = `https://yuranz6.github.io/${repoName}/login.html`;
+        
+        document.getElementById('correctUrl').textContent = correctUrl;
+        document.getElementById('loginLink').href = correctUrl;
+        
+        // Auto-redirect after 2 seconds
+        setTimeout(() => {
+            if (window.location.hostname.includes('github.io')) {
+                window.location.href = `/${repoName}/login.html`;
+            } else {
+                window.location.href = './login.html';
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
+
