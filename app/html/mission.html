@@ -69,15 +69,15 @@
     <div class="mission-images-container">
       <!-- First Row - Two images -->
       <div class="mission-images-row">
-        <img src="/assets/Mission 1.png" alt="Healthcare Building" />
-        <img src="/assets/Mission 2.png" alt="Medical Facility" />
+        <img src="../assets/Mission 1.png" alt="Healthcare Building" />
+        <img src="../assets/Mission 2.png" alt="Medical Facility" />
       </div>
 
       <!-- Second Row - Three images -->
       <div class="mission-images-row three-images">
-        <img src="/assets/Mission 3.png" alt="Disease Prevention Data" />
-        <img src="/assets/Mission 4.png" alt="Medical Statistics" />
-        <img src="/assets/Mission 5.png" alt="Healthcare Insights" />
+        <img src="../assets/Mission 3.png" alt="Disease Prevention Data" />
+        <img src="../assets/Mission 4.png" alt="Medical Statistics" />
+        <img src="../assets/Mission 5.png" alt="Healthcare Insights" />
       </div>
     </div>
   </section>
@@ -85,7 +85,7 @@
   <!-- Footer Section -->
   <div id="footer-container"></div>
   <script>
-    fetch("/components/footer.html")
+    fetch("../components/footer.html")
       .then((response) => response.text())
       .then((data) => {
         document.getElementById("footer-container").innerHTML = data;
