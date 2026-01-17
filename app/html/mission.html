@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/x-icon" href="/assets/logo.svg" />
+  <link rel="icon" type="image/x-icon" href="../assets/logo.svg" />
   <title>Our Mission - Empathy Canada</title>
-  <link href="/css/styles.css" rel="stylesheet" />
-  <script type="module" src="/js/main.js"></script>
+  <link href="../css/styles.css" rel="stylesheet" />
+  <script type="module" src="../js/main.js"></script>
 </head>
 <body class="mission-page">
   <!-- Navigation Bar -->
   <div id="navbar-container"></div>
   <script>
-    fetch("/components/navbar.html")
+    fetch("../components/navbar.html")
       .then((response) => response.text())
       .then((data) => {
         document.getElementById("navbar-container").innerHTML = data;
