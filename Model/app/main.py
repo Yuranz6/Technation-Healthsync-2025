@@ -756,6 +756,24 @@ async def health_check():
         "port": int(os.environ.get("PORT", 8000))
     }
 
+@app.get("/keys")
+async def get_keys():
+    """Return Supabase configuration keys from environment variables"""
+    supabase_url = os.environ.get("SUPABASE_URL", "")
+    supabase_key = os.environ.get("SUPABASE_KEY", os.environ.get("SUPABASE_ANON_KEY", ""))
+    
+    if not supabase_url or not supabase_key:
+        logger.warning("Supabase keys not found in environment variables")
+        raise HTTPException(
+            status_code=503,
+            detail="Supabase configuration not available. Please set SUPABASE_URL and SUPABASE_KEY environment variables."
+        )
+    
+    return {
+        "SUPABASE_URL": supabase_url,
+        "SUPABASE_KEY": supabase_key
+    }
+
 @app.post("/analyze", response_model=AnalysisResult)
 async def analyze_patient(patient_data: PatientData):
     """Analyze patient data"""

@@ -17,6 +17,10 @@ services:
         value: 3.11
       - key: TRANSFORMERS_OFFLINE
         value: "0"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
     healthCheckPath: /health
 
   # Backend API (Node.js)
