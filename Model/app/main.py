@@ -162,7 +162,7 @@ app = FastAPI(
     
     * **ClinicalBERT**: Natural language processing for clinical notes analysis
       - Model: [emilyalsentzer/Bio_ClinicalBERT](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT)
-      - Trained on 1.2B words of diverse diseases + 3M+ patient records
+      - Trained on clinical notes from MIMIC-III v1.4 database
     
     * **XGBoost**: Machine learning for structured data analysis
       - Risk assessment based on patient vitals and lab results
@@ -792,7 +792,7 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
         "symptoms_identified": identified_symptoms,
         "confidence": confidence,
         "analysis": f"ClinicalBERT analysis completed, detected {len(detected_diseases)} possible diseases",
-        "inference_mode": "api" if (USE_HF_INFERENCE_API and hf_client) else "local"
+        "inference_mode": "api" if (USE_HF_INFERENCE_API and HF_TOKEN) else "local"
     }
     
     # Safely add embedding dimension information
