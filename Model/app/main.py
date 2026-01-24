@@ -717,67 +717,74 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
     
     # Common processing for both API and local model
     clinical_notes_lower = clinical_notes.lower()
-        
-        # Check cardiovascular related
-        if any(keyword in clinical_notes_lower for keyword in ["chest pain", "chest tightness", "palpitations", "shortness of breath", "heart", "cardiac", "angina"]):
-            detected_diseases.append("Cardiovascular Disease")
-            identified_symptoms.extend(["chest pain", "chest tightness", "palpitations", "shortness of breath"])
-        
-        # Check diabetes related
-        if any(keyword in clinical_notes_lower for keyword in ["excessive thirst", "frequent urination", "increased hunger", "glucose", "diabetes", "blood sugar", "polyuria", "polydipsia"]):
-            detected_diseases.append("Diabetes")
-            identified_symptoms.extend(["excessive thirst", "frequent urination", "increased hunger"])
-        
-        # Check hypertension related
-        if any(keyword in clinical_notes_lower for keyword in ["hypertension", "blood pressure", "headache", "dizziness", "high bp", "elevated bp"]):
-            detected_diseases.append("Hypertension")
-            identified_symptoms.extend(["headache", "dizziness", "palpitations"])
-        
-        # Check ophthalmic diseases
-        if any(keyword in clinical_notes_lower for keyword in ["eye", "ocular", "vision", "visual", "diplopia", "double vision", "eye weakness", "oculomotor", "palsy", "ptosis", "eyelid", "retina", "optic", "glaucoma", "cataract"]):
-            detected_diseases.append("Ophthalmic Disorder")
-            identified_symptoms.extend(["visual disturbance", "eye weakness", "diplopia"])
-        
-        # Check neurological diseases
-        if any(keyword in clinical_notes_lower for keyword in ["nerve", "neurological", "palsy", "paralysis", "weakness", "numbness", "tingling", "seizure", "epilepsy", "stroke", "cerebral", "brain", "neurological", "cranial nerve"]):
-            detected_diseases.append("Neurological Disorder")
-            identified_symptoms.extend(["nerve weakness", "neurological symptoms"])
-        
-        # Check autoimmune diseases
-        if any(keyword in clinical_notes_lower for keyword in ["autoimmune", "prednisone", "steroid", "inflammation", "immune", "myasthenia", "graves", "thyroid", "rheumatoid", "lupus"]):
-            detected_diseases.append("Autoimmune Disorder")
-            identified_symptoms.extend(["immune system involvement", "steroid responsive"])
-        
-        # Check other common symptoms
-        if any(keyword in clinical_notes_lower for keyword in ["fever", "temperature", "hot", "pyrexia"]):
-            identified_symptoms.append("fever")
-        if any(keyword in clinical_notes_lower for keyword in ["nausea", "vomiting", "sick", "queasy"]):
-            identified_symptoms.append("nausea")
-        if any(keyword in clinical_notes_lower for keyword in ["fatigue", "tired", "weakness", "exhaustion"]):
-            identified_symptoms.append("fatigue")
-        if any(keyword in clinical_notes_lower for keyword in ["cough", "coughing", "productive cough"]):
-            identified_symptoms.append("cough")
-        if any(keyword in clinical_notes_lower for keyword in ["weight loss", "unintended weight loss"]):
-            identified_symptoms.append("weight loss")
-        if any(keyword in clinical_notes_lower for keyword in ["weight gain", "unintended weight gain"]):
-            identified_symptoms.append("weight gain")
-        if any(keyword in clinical_notes_lower for keyword in ["headache", "head pain", "migraine"]):
-            identified_symptoms.append("headache")
-        if any(keyword in clinical_notes_lower for keyword in ["dizziness", "vertigo", "balance"]):
-            identified_symptoms.append("dizziness")
-        
-        result = {
-            "diseases_detected": detected_diseases,
-            "symptoms_identified": identified_symptoms,
-            "confidence": confidence,
-            "analysis": f"ClinicalBERT analysis completed, detected {len(detected_diseases)} possible diseases"
-        }
-        
-        # Safely add embedding dimension information
-        if cls_embedding is not None:
+    
+    # Check cardiovascular related
+    if any(keyword in clinical_notes_lower for keyword in ["chest pain", "chest tightness", "palpitations", "shortness of breath", "heart", "cardiac", "angina"]):
+        detected_diseases.append("Cardiovascular Disease")
+        identified_symptoms.extend(["chest pain", "chest tightness", "palpitations", "shortness of breath"])
+    
+    # Check diabetes related
+    if any(keyword in clinical_notes_lower for keyword in ["excessive thirst", "frequent urination", "increased hunger", "glucose", "diabetes", "blood sugar", "polyuria", "polydipsia"]):
+        detected_diseases.append("Diabetes")
+        identified_symptoms.extend(["excessive thirst", "frequent urination", "increased hunger"])
+    
+    # Check hypertension related
+    if any(keyword in clinical_notes_lower for keyword in ["hypertension", "blood pressure", "headache", "dizziness", "high bp", "elevated bp"]):
+        detected_diseases.append("Hypertension")
+        identified_symptoms.extend(["headache", "dizziness", "palpitations"])
+    
+    # Check ophthalmic diseases
+    if any(keyword in clinical_notes_lower for keyword in ["eye", "ocular", "vision", "visual", "diplopia", "double vision", "eye weakness", "oculomotor", "palsy", "ptosis", "eyelid", "retina", "optic", "glaucoma", "cataract"]):
+        detected_diseases.append("Ophthalmic Disorder")
+        identified_symptoms.extend(["visual disturbance", "eye weakness", "diplopia"])
+    
+    # Check neurological diseases
+    if any(keyword in clinical_notes_lower for keyword in ["nerve", "neurological", "palsy", "paralysis", "weakness", "numbness", "tingling", "seizure", "epilepsy", "stroke", "cerebral", "brain", "neurological", "cranial nerve"]):
+        detected_diseases.append("Neurological Disorder")
+        identified_symptoms.extend(["nerve weakness", "neurological symptoms"])
+    
+    # Check autoimmune diseases
+    if any(keyword in clinical_notes_lower for keyword in ["autoimmune", "prednisone", "steroid", "inflammation", "immune", "myasthenia", "graves", "thyroid", "rheumatoid", "lupus"]):
+        detected_diseases.append("Autoimmune Disorder")
+        identified_symptoms.extend(["immune system involvement", "steroid responsive"])
+    
+    # Check other common symptoms
+    if any(keyword in clinical_notes_lower for keyword in ["fever", "temperature", "hot", "pyrexia"]):
+        identified_symptoms.append("fever")
+    if any(keyword in clinical_notes_lower for keyword in ["nausea", "vomiting", "sick", "queasy"]):
+        identified_symptoms.append("nausea")
+    if any(keyword in clinical_notes_lower for keyword in ["fatigue", "tired", "weakness", "exhaustion"]):
+        identified_symptoms.append("fatigue")
+    if any(keyword in clinical_notes_lower for keyword in ["cough", "coughing", "productive cough"]):
+        identified_symptoms.append("cough")
+    if any(keyword in clinical_notes_lower for keyword in ["weight loss", "unintended weight loss"]):
+        identified_symptoms.append("weight loss")
+    if any(keyword in clinical_notes_lower for keyword in ["weight gain", "unintended weight gain"]):
+        identified_symptoms.append("weight gain")
+    if any(keyword in clinical_notes_lower for keyword in ["headache", "head pain", "migraine"]):
+        identified_symptoms.append("headache")
+    if any(keyword in clinical_notes_lower for keyword in ["dizziness", "vertigo", "balance"]):
+        identified_symptoms.append("dizziness")
+    
+    # Build result dictionary
+    result = {
+        "diseases_detected": detected_diseases,
+        "symptoms_identified": identified_symptoms,
+        "confidence": confidence,
+        "analysis": f"ClinicalBERT analysis completed, detected {len(detected_diseases)} possible diseases",
+        "inference_mode": "api" if (USE_HF_INFERENCE_API and hf_client) else "local"
+    }
+    
+    # Safely add embedding dimension information
+    if cls_embedding is not None:
+        if hasattr(cls_embedding, 'shape'):
             result["embedding_dim"] = cls_embedding.shape[-1]
+        elif isinstance(cls_embedding, list):
+            result["embedding_dim"] = len(cls_embedding) if cls_embedding else "N/A"
         else:
-            result["embedding_dim"] = "N/A"
+            result["embedding_dim"] = "vector"
+    else:
+        result["embedding_dim"] = "N/A"
             
         return result
         
