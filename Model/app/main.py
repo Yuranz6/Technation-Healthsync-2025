@@ -785,8 +785,8 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
             result["embedding_dim"] = "vector"
     else:
         result["embedding_dim"] = "N/A"
-            
-        return result
+    
+    return result
         
     except Exception as e:
         logger.error(f"ClinicalBERT analysis failed: {str(e)}")
