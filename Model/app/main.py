@@ -863,7 +863,15 @@ async def get_models_status():
         "clinical_bert": {
             "status": "loaded",
             "version": "medicalai/ClinicalBERT",
-            "description": "ClinicalBERT model for analyzing clinical notes"
+            "model_url": "https://huggingface.co/medicalai/ClinicalBERT",
+            "description": "ClinicalBERT model for analyzing clinical notes",
+            "model_info": {
+                "name": "ClinicalBERT",
+                "organization": "medicalai",
+                "training_data": "1.2B words of diverse diseases + EHRs from 3M+ patient records",
+                "paper": "Wang, G., et al. A Generalist Medical Language Model for Disease Diagnosis Assistance. Nat Med (2025)",
+                "citation": "https://doi.org/10.1038/s41591-024-03416-6"
+            }
         },
         "xgboost": {
             "status": "loaded", 
