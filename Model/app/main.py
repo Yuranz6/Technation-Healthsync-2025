@@ -17,13 +17,8 @@ import torch
 from pathlib import Path
 import csv
 
-# Hugging Face Inference API support
-try:
-    from huggingface_hub import InferenceClient
-    HF_INFERENCE_AVAILABLE = True
-except ImportError:
-    HF_INFERENCE_AVAILABLE = False
-    logger.warning("huggingface_hub not available, Inference API will not be used")
+# Hugging Face Inference API support using requests
+import requests
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -33,27 +28,45 @@ logger = logging.getLogger(__name__)
 # Set USE_HF_INFERENCE_API=true to use Hugging Face Inference API (recommended for production)
 USE_HF_INFERENCE_API = os.environ.get("USE_HF_INFERENCE_API", "false").lower() == "true"
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-HF_MODEL_NAME = "medicalai/ClinicalBERT"
+HF_MODEL_NAME = "emilyalsentzer/Bio_ClinicalBERT"
+HF_API_URL = f"https://router.huggingface.co/hf-inference/models/{HF_MODEL_NAME}"
 
 # Initialize ClinicalBERT model - Lazy loading to save memory
 # Or use Hugging Face Inference API (no local model loading needed)
-if USE_HF_INFERENCE_API and HF_TOKEN and HF_INFERENCE_AVAILABLE:
+if USE_HF_INFERENCE_API and HF_TOKEN:
     logger.info("🚀 Using Hugging Face Inference API (no local model loading)")
     logger.info(f"Model: {HF_MODEL_NAME}")
-    hf_client = InferenceClient(
-        provider="hf-inference",
-        api_key=HF_TOKEN,
-    )
+    logger.info(f"API URL: {HF_API_URL}")
+    
+    # Prepare headers for API requests
+    hf_headers = {
+        "Authorization": f"Bearer {HF_TOKEN}",
+    }
+    
+    # Test API connection
+    try:
+        test_response = requests.post(
+            HF_API_URL,
+            headers=hf_headers,
+            json={"inputs": "test"},
+            timeout=5
+        )
+        if test_response.status_code == 200:
+            logger.info("✅ Hugging Face Inference API initialized and accessible")
+        else:
+            logger.warning(f"⚠️ API test returned status {test_response.status_code}")
+    except Exception as e:
+        logger.warning(f"⚠️ API connection test failed: {e}")
+    
     tokenizer = None
     model = None
     model_loaded = True  # API is always "loaded"
-    logger.info("✅ Hugging Face Inference API initialized")
 else:
     if USE_HF_INFERENCE_API:
-        logger.warning("⚠️ USE_HF_INFERENCE_API=true but HF_TOKEN not set or huggingface_hub not available")
+        logger.warning("⚠️ USE_HF_INFERENCE_API=true but HF_TOKEN not set")
         logger.warning("Falling back to local model loading")
     logger.info("Initializing ClinicalBERT model (lazy loading)...")
-    hf_client = None
+    hf_headers = None
     tokenizer = None
     model = None
     model_loaded = False
@@ -61,25 +74,25 @@ else:
 def load_model():
     """
     Lazy load the ClinicalBERT model from Hugging Face (if not using Inference API)
-    Model: https://huggingface.co/medicalai/ClinicalBERT
+    Model: https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT
     
-    This model was trained on a large multicenter dataset with 1.2B words
-    of diverse diseases and fine-tuned on EHRs from over 3 million patient records.
+    Bio_ClinicalBERT is a BERT model trained on clinical notes from MIMIC-III v1.4.
+    It's specifically designed for clinical text understanding.
     
     If USE_HF_INFERENCE_API=true, this function returns None as the model
     is accessed via the Inference API instead.
     """
-    global tokenizer, model, model_loaded, hf_client
+    global tokenizer, model, model_loaded
     
     # If using Inference API, no local model needed
-    if USE_HF_INFERENCE_API and hf_client:
-        return None, None  # API client is global
+    if USE_HF_INFERENCE_API:
+        return None, None  # API is accessed via requests
     
     if model_loaded:
         return tokenizer, model
     
     # Hugging Face model identifier
-    model_name = "medicalai/ClinicalBERT"
+    model_name = HF_MODEL_NAME
     
     try:
         # Try to use local model if path is provided and exists
@@ -92,8 +105,8 @@ def load_model():
             logger.info("Local ClinicalBERT model loaded successfully")
         else:
             # Load model directly from Hugging Face
-            logger.info(f"Loading ClinicalBERT from Hugging Face: {model_name}")
-            logger.info("Reference: https://huggingface.co/medicalai/ClinicalBERT")
+            logger.info(f"Loading Bio_ClinicalBERT from Hugging Face: {model_name}")
+            logger.info("Reference: https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT")
             
             # Load tokenizer
             tokenizer = AutoTokenizer.from_pretrained(
@@ -148,7 +161,7 @@ app = FastAPI(
     This API combines three powerful AI technologies:
     
     * **ClinicalBERT**: Natural language processing for clinical notes analysis
-      - Model: [medicalai/ClinicalBERT](https://huggingface.co/medicalai/ClinicalBERT)
+      - Model: [emilyalsentzer/Bio_ClinicalBERT](https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT)
       - Trained on 1.2B words of diverse diseases + 3M+ patient records
     
     * **XGBoost**: Machine learning for structured data analysis
@@ -641,44 +654,51 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
         }
     
     # Option 1: Use Hugging Face Inference API (no local model needed)
-    if USE_HF_INFERENCE_API and hf_client:
+    if USE_HF_INFERENCE_API and HF_TOKEN:
         try:
             logger.info("Using Hugging Face Inference API for analysis")
             
-            # Use feature extraction to get embeddings
-            # ClinicalBERT is a BERT-based model, so we can use feature-extraction
-            try:
-                # Try feature extraction (embeddings)
-                embeddings = hf_client.feature_extraction(
-                    clinical_notes,
-                    model=HF_MODEL_NAME,
-                )
-                logger.info(f"Got embeddings from Inference API: {len(embeddings) if isinstance(embeddings, list) else 'vector'}")
-                cls_embedding = embeddings  # Store for later use
-            except Exception as e:
-                logger.warning(f"Feature extraction failed: {e}, trying fill_mask as fallback")
-                # Fallback: Use fill_mask to understand context
-                # Create a masked version of key medical terms
-                masked_text = clinical_notes.replace("pain", "[MASK]").replace("symptom", "[MASK]")
+            # Use fill_mask task for Bio_ClinicalBERT
+            # Create a masked version of the clinical notes for context understanding
+            masked_text = clinical_notes
+            # If no [MASK] token, add one at the end for analysis
+            if "[MASK]" not in masked_text:
+                # Try to mask key medical terms
+                masked_text = masked_text.replace(" pain", " [MASK]")
+                masked_text = masked_text.replace(" symptom", " [MASK]")
                 if "[MASK]" not in masked_text:
-                    masked_text = clinical_notes[:100] + " [MASK]."
+                    # Fallback: add mask at the end
+                    masked_text = clinical_notes[:200] + " [MASK]."
+            
+            # Call Hugging Face Inference API using requests
+            payload = {
+                "inputs": masked_text,
+            }
+            
+            response = requests.post(
+                HF_API_URL,
+                headers=hf_headers,
+                json=payload,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                logger.info(f"Got response from Inference API: {type(result)}")
+                cls_embedding = result  # Store result for later use
                 
-                try:
-                    result = hf_client.fill_mask(
-                        masked_text,
-                        model=HF_MODEL_NAME,
-                    )
-                    logger.info(f"Got fill_mask result from Inference API")
-                    cls_embedding = result  # Store result
-                except Exception as e2:
-                    logger.warning(f"Fill mask also failed: {e2}, using keyword analysis")
-                    return analyze_with_keywords(clinical_notes)
+                # Process the API result
+                detected_diseases = []
+                identified_symptoms = []
+                confidence = 0.85  # Higher confidence for API (model is always available)
+            else:
+                logger.warning(f"API returned status {response.status_code}: {response.text}")
+                return analyze_with_keywords(clinical_notes)
             
-            # Process the API result
-            detected_diseases = []
-            identified_symptoms = []
-            confidence = 0.85  # Higher confidence for API (model is always available)
-            
+        except requests.exceptions.Timeout:
+            logger.error("Hugging Face Inference API timeout")
+            logger.warning("Falling back to keyword-based analysis")
+            return analyze_with_keywords(clinical_notes)
         except Exception as e:
             logger.error(f"Hugging Face Inference API error: {e}")
             logger.warning("Falling back to keyword-based analysis")
