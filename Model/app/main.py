@@ -5,7 +5,7 @@ Combines HuggingFace ClinicalBERT model and XGBoost for disease diagnosis
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
 import uvicorn
 import json
@@ -93,10 +93,69 @@ def load_model():
         model_loaded = True  # Mark as loaded to prevent retry loops
         return None, None
 
+# FastAPI Application Configuration
+# FastAPI is recommended for API services due to:
+# - Automatic API documentation (Swagger/OpenAPI)
+# - Type validation with Pydantic
+# - High performance (async support)
+# - Easy dependency injection
+# - Built-in data validation and serialization
+
 app = FastAPI(
-    title="Hybrid Model Disease Diagnosis API",
-    description="ClinicalBERT + XGBoost + RAG Hybrid Model System",
-    version="1.0.0"
+    title="HealthSync AI - Hybrid Model Disease Diagnosis API",
+    description="""
+    **AI-Powered Medical Diagnosis System**
+    
+    This API combines three powerful AI technologies:
+    
+    * **ClinicalBERT**: Natural language processing for clinical notes analysis
+      - Model: [medicalai/ClinicalBERT](https://huggingface.co/medicalai/ClinicalBERT)
+      - Trained on 1.2B words of diverse diseases + 3M+ patient records
+    
+    * **XGBoost**: Machine learning for structured data analysis
+      - Risk assessment based on patient vitals and lab results
+    
+    * **RAG System**: Retrieval-Augmented Generation for medical knowledge
+      - Evidence-based recommendations and guidelines
+    
+    ## Features
+    
+    * 🔬 Multi-modal analysis (text + structured data)
+    * 📊 Risk assessment and confidence scoring
+    * 💡 Evidence-based recommendations
+    * 🔍 Differential diagnosis suggestions
+    * 📋 Follow-up questions generation
+    """,
+    version="1.0.0",
+    terms_of_service="https://github.com/Yuranz6/Technation-Healthsync-2025",
+    contact={
+        "name": "HealthSync AI Team",
+        "url": "https://github.com/Yuranz6/Technation-Healthsync-2025",
+    },
+    license_info={
+        "name": "MIT",
+    },
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc",  # ReDoc
+    openapi_url="/openapi.json",  # OpenAPI schema
+    openapi_tags=[
+        {
+            "name": "Health",
+            "description": "Health check and system status endpoints",
+        },
+        {
+            "name": "Analysis",
+            "description": "AI-powered patient data analysis endpoints",
+        },
+        {
+            "name": "Configuration",
+            "description": "Configuration and environment endpoints",
+        },
+        {
+            "name": "Models",
+            "description": "Model status and information endpoints",
+        },
+    ],
 )
 
 # -------------------------------
@@ -406,42 +465,81 @@ except Exception as e:
     logger.info("RAG will use built-in knowledge base only")
     data_kb = None
 
-# Add CORS middleware
+# CORS Middleware Configuration
+# FastAPI's CORS middleware handles cross-origin requests
+# In production, you should restrict allow_origins to specific domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",  # Allow all origins (for development)
+        # In production, specify exact origins:
+        # "https://yuranz6.github.io",
+        # "https://technation-healthsync-2025.onrender.com",
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
-# Data models
+# Pydantic Data Models
+# FastAPI uses Pydantic for automatic request/response validation
+# This ensures type safety and automatic API documentation
+
 class PatientData(BaseModel):
-    age: int
-    gender: str
-    blood_pressure: Optional[str] = None
-    cholesterol: Optional[float] = None
-    blood_glucose: Optional[float] = None
-    hdl: Optional[float] = None
-    ldl: Optional[float] = None
-    bun: Optional[float] = None
-    creatinine: Optional[float] = None
-    hba1c: Optional[float] = None
-    clinical_notes: Optional[str] = None
-    height: Optional[float] = None
-    weight: Optional[float] = None
-    allergies: Optional[str] = None
-    prescriptions: Optional[str] = None
+    """Patient data model for diagnosis analysis"""
+    age: int = Field(..., ge=0, le=150, description="Patient age in years")
+    gender: str = Field(..., description="Patient gender (e.g., 'male', 'female', 'other')")
+    blood_pressure: Optional[str] = Field(None, description="Blood pressure reading (e.g., '120/80')")
+    cholesterol: Optional[float] = Field(None, ge=0, description="Total cholesterol level (mg/dL)")
+    blood_glucose: Optional[float] = Field(None, ge=0, description="Blood glucose level (mg/dL)")
+    hdl: Optional[float] = Field(None, ge=0, description="HDL cholesterol level (mg/dL)")
+    ldl: Optional[float] = Field(None, ge=0, description="LDL cholesterol level (mg/dL)")
+    bun: Optional[float] = Field(None, ge=0, description="Blood urea nitrogen (mg/dL)")
+    creatinine: Optional[float] = Field(None, ge=0, description="Serum creatinine (mg/dL)")
+    hba1c: Optional[float] = Field(None, ge=0, le=20, description="HbA1c percentage")
+    clinical_notes: Optional[str] = Field(None, description="Free-text clinical notes and symptoms")
+    height: Optional[float] = Field(None, ge=0, description="Height in cm")
+    weight: Optional[float] = Field(None, ge=0, description="Weight in kg")
+    allergies: Optional[str] = Field(None, description="Known allergies")
+    prescriptions: Optional[str] = Field(None, description="Current medications")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "age": 45,
+                "gender": "male",
+                "blood_pressure": "140/90",
+                "cholesterol": 220.0,
+                "blood_glucose": 110.0,
+                "hdl": 45.0,
+                "ldl": 150.0,
+                "clinical_notes": "Patient presents with chest pain and shortness of breath",
+                "height": 175.0,
+                "weight": 80.0
+            }
+        }
 
 class AnalysisResult(BaseModel):
-    success: bool
-    timestamp: str
-    clinical_bert_analysis: Dict[str, Any]
-    xgboost_analysis: Dict[str, Any]
-    rag_insights: Dict[str, Any]
-    fusion_result: Dict[str, Any]
-    recommendations: list
-    confidence_score: float
+    """Analysis result model with comprehensive diagnosis information"""
+    success: bool = Field(..., description="Whether the analysis was successful")
+    timestamp: str = Field(..., description="ISO format timestamp of the analysis")
+    clinical_bert_analysis: Dict[str, Any] = Field(..., description="ClinicalBERT text analysis results")
+    xgboost_analysis: Dict[str, Any] = Field(..., description="XGBoost structured data analysis results")
+    rag_insights: Dict[str, Any] = Field(..., description="RAG system knowledge retrieval results")
+    fusion_result: Dict[str, Any] = Field(..., description="Fused analysis results from all models")
+    recommendations: list = Field(..., description="Evidence-based recommendations")
+    confidence_score: float = Field(..., ge=0.0, le=1.0, description="Overall confidence score (0-1)")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "success": True,
+                "timestamp": "2025-01-15T10:30:00",
+                "confidence_score": 0.85
+            }
+        }
 
 # Simulated medical knowledge base
 MEDICAL_KNOWLEDGE_BASE = {
@@ -768,11 +866,44 @@ def fuse_analysis_results(clinical_bert_result: Dict, xgboost_result: Dict, rag_
         "urgency": "High" if risk_level == "High risk" else "Medium" if risk_level == "Medium risk" else "Low"
     }
 
-@app.get("/")
-async def root():
-    return {"message": "Hybrid Model Disease Diagnosis API", "status": "running"}
+# FastAPI Event Handlers
+@app.on_event("startup")
+async def startup_event():
+    """Called when the FastAPI application starts"""
+    logger.info("🚀 HealthSync AI API is starting up...")
+    logger.info("📚 API Documentation available at: /docs")
+    logger.info("📖 Alternative docs at: /redoc")
 
-@app.get("/health")
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Called when the FastAPI application shuts down"""
+    logger.info("🛑 HealthSync AI API is shutting down...")
+
+# API Endpoints with FastAPI decorators
+@app.get(
+    "/",
+    tags=["Health"],
+    summary="Root endpoint",
+    description="Returns API status and basic information",
+    response_description="API status message"
+)
+async def root():
+    """Root endpoint - API status"""
+    return {
+        "message": "HealthSync AI - Hybrid Model Disease Diagnosis API",
+        "status": "running",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+@app.get(
+    "/health",
+    tags=["Health"],
+    summary="Health check endpoint",
+    description="Check API health and model status",
+    response_description="Health status with model information"
+)
 async def health_check():
     # Check if model is loaded
     current_tokenizer, current_model = load_model()
@@ -789,7 +920,13 @@ async def health_check():
         "port": int(os.environ.get("PORT", 8000))
     }
 
-@app.get("/keys")
+@app.get(
+    "/keys",
+    tags=["Configuration"],
+    summary="Get Supabase configuration keys",
+    description="Returns Supabase URL and API key from environment variables",
+    response_description="Supabase configuration"
+)
 async def get_keys():
     """Return Supabase configuration keys from environment variables"""
     supabase_url = os.environ.get("SUPABASE_URL", "")
@@ -807,7 +944,22 @@ async def get_keys():
         "SUPABASE_KEY": supabase_key
     }
 
-@app.post("/analyze", response_model=AnalysisResult)
+@app.post(
+    "/analyze",
+    response_model=AnalysisResult,
+    tags=["Analysis"],
+    summary="Analyze patient data",
+    description="""
+    Comprehensive AI-powered patient data analysis using:
+    
+    * **ClinicalBERT**: Analyzes clinical notes and symptoms
+    * **XGBoost**: Evaluates structured data (vitals, lab results)
+    * **RAG System**: Retrieves evidence-based medical knowledge
+    
+    Returns a comprehensive diagnosis with confidence scores and recommendations.
+    """,
+    response_description="Complete analysis results with diagnosis and recommendations"
+)
 async def analyze_patient(patient_data: PatientData):
     """Analyze patient data"""
     try:
@@ -856,7 +1008,13 @@ async def analyze_patient(patient_data: PatientData):
         logger.error(f"Analysis failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
-@app.get("/models/status")
+@app.get(
+    "/models/status",
+    tags=["Models"],
+    summary="Get model status and information",
+    description="Returns detailed status and information about all AI models",
+    response_description="Model status and metadata"
+)
 async def get_models_status():
     """Get model status"""
     return {
