@@ -28,35 +28,68 @@ model = None
 model_loaded = False
 
 def load_model():
-    """Lazy load the model only when needed"""
+    """
+    Lazy load the ClinicalBERT model from Hugging Face
+    Model: https://huggingface.co/medicalai/ClinicalBERT
+    
+    This model was trained on a large multicenter dataset with 1.2B words
+    of diverse diseases and fine-tuned on EHRs from over 3 million patient records.
+    """
     global tokenizer, model, model_loaded
     if model_loaded:
         return tokenizer, model
+    
+    # Hugging Face model identifier
+    model_name = "medicalai/ClinicalBERT"
     
     try:
         # Try to use local model if path is provided and exists
         local_model_path = os.environ.get("LOCAL_MODEL_PATH")
         if local_model_path and os.path.exists(local_model_path):
             logger.info(f"Loading local model from: {local_model_path}")
-            tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
+            logger.info(f"Using tokenizer from Hugging Face: {model_name}")
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
             model = AutoModel.from_pretrained(local_model_path)
             logger.info("Local ClinicalBERT model loaded successfully")
         else:
-            # Fallback to online model with memory optimization
-            logger.info("Loading online model with memory optimization...")
-            tokenizer = AutoTokenizer.from_pretrained("medicalai/ClinicalBERT")
-            # Use low_cpu_mem_usage to reduce memory footprint
-            model = AutoModel.from_pretrained(
-                "medicalai/ClinicalBERT",
-                low_cpu_mem_usage=True,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
+            # Load model directly from Hugging Face
+            logger.info(f"Loading ClinicalBERT from Hugging Face: {model_name}")
+            logger.info("Reference: https://huggingface.co/medicalai/ClinicalBERT")
+            
+            # Load tokenizer
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_name,
+                trust_remote_code=False  # ClinicalBERT doesn't require custom code
             )
-            logger.info("Online ClinicalBERT model loaded successfully")
+            logger.info("Tokenizer loaded successfully")
+            
+            # Load model with memory optimization for Render's free tier (512MB RAM)
+            model = AutoModel.from_pretrained(
+                model_name,
+                low_cpu_mem_usage=True,  # Reduce memory footprint during loading
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                trust_remote_code=False
+            )
+            logger.info("ClinicalBERT model loaded successfully from Hugging Face")
+            logger.info(f"Model type: {type(model).__name__}")
+            logger.info(f"Model device: {next(model.parameters()).device if model else 'N/A'}")
+        
+        # Set model to evaluation mode
+        model.eval()
         model_loaded = True
+        logger.info("ClinicalBERT is ready for inference")
         return tokenizer, model
-    except Exception as e:
-        logger.warning(f"Model loading failed: {e}")
+        
+    except torch.cuda.OutOfMemoryError as e:
+        logger.error(f"CUDA out of memory: {e}")
         logger.warning("Will use fallback keyword-based analysis")
+        model_loaded = True
+        return None, None
+    except Exception as e:
+        logger.error(f"Model loading failed: {e}")
+        logger.error(f"Error type: {type(e).__name__}")
+        logger.warning("Will use fallback keyword-based analysis")
+        logger.info("This is expected on Render's free tier if memory is insufficient")
         model_loaded = True  # Mark as loaded to prevent retry loops
         return None, None
 
