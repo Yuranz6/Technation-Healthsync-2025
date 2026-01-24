@@ -1028,7 +1028,7 @@ async def root():
 )
 async def health_check():
     # Check model status
-    if USE_HF_INFERENCE_API and hf_client:
+    if USE_HF_INFERENCE_API and HF_TOKEN:
         model_status = "inference_api"
         model_info = {
             "mode": "Hugging Face Inference API",
@@ -1163,15 +1163,16 @@ async def get_models_status():
     return {
         "clinical_bert": {
             "status": "loaded",
-            "version": "medicalai/ClinicalBERT",
-            "model_url": "https://huggingface.co/medicalai/ClinicalBERT",
-            "description": "ClinicalBERT model for analyzing clinical notes",
+            "version": "emilyalsentzer/Bio_ClinicalBERT",
+            "model_url": "https://huggingface.co/emilyalsentzer/Bio_ClinicalBERT",
+            "api_url": HF_API_URL if USE_HF_INFERENCE_API else None,
+            "description": "Bio_ClinicalBERT model for analyzing clinical notes",
             "model_info": {
-                "name": "ClinicalBERT",
-                "organization": "medicalai",
-                "training_data": "1.2B words of diverse diseases + EHRs from 3M+ patient records",
-                "paper": "Wang, G., et al. A Generalist Medical Language Model for Disease Diagnosis Assistance. Nat Med (2025)",
-                "citation": "https://doi.org/10.1038/s41591-024-03416-6"
+                "name": "Bio_ClinicalBERT",
+                "organization": "emilyalsentzer",
+                "training_data": "Clinical notes from MIMIC-III v1.4 database",
+                "paper": "Alsentzer, E., et al. Publicly Available Clinical BERT Embeddings. NAACL 2019",
+                "citation": "https://www.aclweb.org/anthology/W19-1909/"
             }
         },
         "xgboost": {
