@@ -807,11 +807,6 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
         result["embedding_dim"] = "N/A"
     
     return result
-        
-    except Exception as e:
-        logger.error(f"ClinicalBERT analysis failed: {str(e)}")
-        # Fallback to keyword-based analysis
-        return analyze_with_keywords(clinical_notes)
 
 def analyze_with_keywords(clinical_notes: str) -> Dict[str, Any]:
     """Fallback keyword-based analysis when model is unavailable"""
