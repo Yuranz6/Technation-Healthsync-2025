@@ -1006,7 +1006,12 @@ async def analyze_patient(patient_data: PatientData):
         
     except Exception as e:
         logger.error(f"Analysis failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+        logger.error(f"Analysis failed: {str(e)}")
+        logger.exception("Full error traceback:")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Analysis failed: {str(e)}. Please check logs for details."
+        )
 
 @app.get(
     "/models/status",
