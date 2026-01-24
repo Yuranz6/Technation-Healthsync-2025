@@ -17,25 +17,64 @@ import torch
 from pathlib import Path
 import csv
 
+# Hugging Face Inference API support
+try:
+    from huggingface_hub import InferenceClient
+    HF_INFERENCE_AVAILABLE = True
+except ImportError:
+    HF_INFERENCE_AVAILABLE = False
+    logger.warning("huggingface_hub not available, Inference API will not be used")
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Model loading strategy: "inference_api" or "local"
+# Set USE_HF_INFERENCE_API=true to use Hugging Face Inference API (recommended for production)
+USE_HF_INFERENCE_API = os.environ.get("USE_HF_INFERENCE_API", "false").lower() == "true"
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
+HF_MODEL_NAME = "medicalai/ClinicalBERT"
+
 # Initialize ClinicalBERT model - Lazy loading to save memory
-logger.info("Initializing ClinicalBERT model (lazy loading)...")
-tokenizer = None
-model = None
-model_loaded = False
+# Or use Hugging Face Inference API (no local model loading needed)
+if USE_HF_INFERENCE_API and HF_TOKEN and HF_INFERENCE_AVAILABLE:
+    logger.info("🚀 Using Hugging Face Inference API (no local model loading)")
+    logger.info(f"Model: {HF_MODEL_NAME}")
+    hf_client = InferenceClient(
+        provider="hf-inference",
+        api_key=HF_TOKEN,
+    )
+    tokenizer = None
+    model = None
+    model_loaded = True  # API is always "loaded"
+    logger.info("✅ Hugging Face Inference API initialized")
+else:
+    if USE_HF_INFERENCE_API:
+        logger.warning("⚠️ USE_HF_INFERENCE_API=true but HF_TOKEN not set or huggingface_hub not available")
+        logger.warning("Falling back to local model loading")
+    logger.info("Initializing ClinicalBERT model (lazy loading)...")
+    hf_client = None
+    tokenizer = None
+    model = None
+    model_loaded = False
 
 def load_model():
     """
-    Lazy load the ClinicalBERT model from Hugging Face
+    Lazy load the ClinicalBERT model from Hugging Face (if not using Inference API)
     Model: https://huggingface.co/medicalai/ClinicalBERT
     
     This model was trained on a large multicenter dataset with 1.2B words
     of diverse diseases and fine-tuned on EHRs from over 3 million patient records.
+    
+    If USE_HF_INFERENCE_API=true, this function returns None as the model
+    is accessed via the Inference API instead.
     """
-    global tokenizer, model, model_loaded
+    global tokenizer, model, model_loaded, hf_client
+    
+    # If using Inference API, no local model needed
+    if USE_HF_INFERENCE_API and hf_client:
+        return None, None  # API client is global
+    
     if model_loaded:
         return tokenizer, model
     
@@ -615,12 +654,13 @@ def analyze_with_clinical_bert(clinical_notes: str) -> Dict[str, Any]:
                 # If unable to get CLS embedding, use pooler_output
                 cls_embedding = outputs.pooler_output if hasattr(outputs, 'pooler_output') else None
             
-        # Disease detection based on embeddings (simplified method)
-        # In practice, you may need to train a classifier
-        detected_diseases = []
-        identified_symptoms = []
-        confidence = 0.8
+            # Disease detection based on embeddings (simplified method)
+            # In practice, you may need to train a classifier
+            detected_diseases = []
+            identified_symptoms = []
+            confidence = 0.8
         
+        # Common processing for both API and local model
         clinical_notes_lower = clinical_notes.lower()
         
         # Check cardiovascular related
@@ -905,19 +945,35 @@ async def root():
     response_description="Health status with model information"
 )
 async def health_check():
-    # Check if model is loaded
-    current_tokenizer, current_model = load_model()
-    model_status = "loaded" if (current_tokenizer is not None and current_model is not None) else "fallback_mode"
+    # Check model status
+    if USE_HF_INFERENCE_API and hf_client:
+        model_status = "inference_api"
+        model_info = {
+            "mode": "Hugging Face Inference API",
+            "model": HF_MODEL_NAME,
+            "status": "ready"
+        }
+    else:
+        current_tokenizer, current_model = load_model()
+        model_status = "loaded" if (current_tokenizer is not None and current_model is not None) else "fallback_mode"
+        model_info = {
+            "mode": "local" if model_status == "loaded" else "fallback",
+            "status": model_status
+        }
     
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "models": {
-            "clinical_bert": model_status,
+            "clinical_bert": {
+                "status": model_status,
+                **model_info
+            },
             "xgboost": "loaded", 
             "rag_system": "loaded"
         },
-        "port": int(os.environ.get("PORT", 8000))
+        "port": int(os.environ.get("PORT", 8000)),
+        "inference_mode": "api" if USE_HF_INFERENCE_API else "local"
     }
 
 @app.get(
