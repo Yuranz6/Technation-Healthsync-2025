@@ -9,6 +9,12 @@
 
 HealthSync AI is an advanced healthcare diagnosis platform that combines multiple AI technologies to provide comprehensive medical analysis. The system integrates **ClinicalBERT**, **XGBoost**, and **RAG (Retrieval-Augmented Generation)** to deliver intelligent disease diagnosis and medical recommendations.
 
+## Live Demo
+
+### [▶ View Live Demo](https://baisiyou.github.io/health/)
+
+> Team-hosted demo developed for the 2025 Canadian HealthSync Innovation Challenge.
+
 ### 🧠 Hybrid AI Architecture
 
 - **ClinicalBERT**: Analyzes clinical notes and unstructured medical text
